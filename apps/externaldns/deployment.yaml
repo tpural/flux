@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+  namespace: external-dns
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: external-dns
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      serviceAccountName: external-dns
+      containers:
+      - name: external-dns
+        image: registry.k8s.io/external-dns/external-dns:v0.14.0
+        envFrom:
+        - secretRef:
+            name: pihole-password
+        args:
+        - --source=service
+        - --source=ingress
+        - --registry=noop
+        - --policy=upsert-only
+        - --provider=pihole
+        - --pihole-server=http://pihole.tapslab.com
+      securityContext:
+        fsGroup: 65534
