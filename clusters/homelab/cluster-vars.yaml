@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cluster-info
+  name: cluster-vars
   namespace: flux-system
 data:
   cluster_name: homelab

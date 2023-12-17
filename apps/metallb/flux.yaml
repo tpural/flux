@@ -13,5 +13,5 @@ spec:
   postBuild:
     substituteFrom:
       - kind: ConfigMap
-        name: cluster-info
+        name: cluster-vars
         optional: false
