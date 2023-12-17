@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cluster-info
-  namespace: default
+  namespace: flux-system
 data:
-  cluster-name: homelab
+  cluster_name: homelab
+  metallb_range: 10.1.50.140-10.1.50.240
