@@ -9,7 +9,7 @@ data:
       title: Tapslab
     sections:
       - name: External Sites
-        icon: ':globe_showing_americas:'
+        icon: ':globe_with_meridians:'
         items:
           - title: GitHub
             description: Dashy source code and docs
