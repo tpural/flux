@@ -9,7 +9,7 @@ data:
       title: Tapslab
     sections:
       - name: External Sites
-        icon: :globe_showing_americas:
+        icon: ':globe_showing_americas:'
         items:
           - title: GitHub
             description: Dashy source code and docs
@@ -20,7 +20,7 @@ data:
             icon: si-ubiquiti
             url: https://unifi.ui.com/
       - name: Local Services
-        icon: :house:
+        icon: ':house:'
         items:
           - title: MikroTik Router
             icon: si-mikrotik
