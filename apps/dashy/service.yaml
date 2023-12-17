@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashy
+  namespace: dashy
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: dashy.tapslab.com
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    name: http
+    targetPort: 80
+  selector:
+    app: dashy
