@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - ../apps/metallb/flux.yaml
   - ../apps/externaldns/flux.yaml
+  - ../apps/nfs-provisioner/flux.yaml
