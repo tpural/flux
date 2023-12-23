@@ -32,5 +32,5 @@ data:
             icon: si-synology
             url: http://tapsnas.tapslab.com
           - title: httpbin
-            icon: 'fas h'
+            icon: fas trash
             url: http://httpbin.tapslab.com
