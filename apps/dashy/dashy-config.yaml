@@ -28,3 +28,9 @@ data:
           - title: Pi-hole
             icon: si-pihole
             url: http://pihole.tapslab.com/admin/login.php
+          - title: Synology Nas
+            icon: si-synology
+            url: http://tapsnas.tapslab.com
+          - title: httpbin
+            icon: 'fas h'
+            url: http://httpbin.tapslab.com
