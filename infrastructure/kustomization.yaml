@@ -5,3 +5,4 @@ resources:
   - ../apps/externaldns/flux.yaml
   - ../apps/nfs-provisioner/flux.yaml
   - ../apps/httpbin/flux.yaml
+  - ../apps/cloudflare-operator/flux.yaml
