@@ -5,3 +5,4 @@ resources:
   - github.com/adyanth/cloudflare-operator.git//config/default?ref=main
   - cloudflare-secrets.yaml
   - cluster-tunnel.yaml
+  - samplesite.yaml
