@@ -1,0 +1,13 @@
+apiVersion: networking.cfargotunnel.com/v1alpha1
+kind: ClusterTunnel
+metadata:
+  name: k3s-cluster-tunnel      # The ClusterTunnel Custom Resource Name
+spec:
+  newTunnel:
+    name: my-k8s-tunnel         # Name of your new tunnel on Cloudflare
+  size: 2                       # This is the number of replicas for cloudflared
+  cloudflare:
+    email: tapuralewski@gmail.com     # Your email used to login to the Cloudflare Dashboard
+    domain: tapslab.com               # Domain under which the tunnel runs and adds DNS entries to
+    secret: cloudflare-secrets        # The secret created before
+    accountId: a5381a9e7dc8006a86499f0bba4d1183
