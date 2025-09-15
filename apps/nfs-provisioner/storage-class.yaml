@@ -1,0 +1,9 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-client-retain
+provisioner: k8s-sigs.io/nfs-subdir-external-provisioner 
+parameters:
+  pathPattern: "retain/${.PVC.namespace}-${.PVC.name}" 
+  onDelete: retain
+reclaimPolicy: Retain
