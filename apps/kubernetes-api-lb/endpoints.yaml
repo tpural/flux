@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: kubernetes-api-lb
+  namespace: default
+  labels:
+    app: kubernetes-api-lb
+subsets:
+- addresses:
+  - ip: "10.1.51.110"
+  - ip: "10.1.51.109"
+  - ip: "10.1.51.108"
+  ports:
+  - name: https
+    port: 6443
+    protocol: TCP

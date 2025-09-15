@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - ../../apps/metallb/flux.yaml
 - ../../apps/nfs-provisioner/flux.yaml
+- ../../apps/kubernetes-api-lb/flux.yaml
 
 components:
 - config/metallb
