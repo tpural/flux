@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-lb
+  namespace: pihole
+  labels:
+    app: pihole
+  annotations:
+    metallb.universe.tf/address-pool: homelab-pool
+    metallb.universe.tf/allow-shared-ip: "true"
+spec:
+  type: LoadBalancer
+  selector:
+    app: pihole
+  ports:
+  - name: dns-udp
+    port: 53
+    protocol: UDP
+    targetPort: dns-udp
+  - name: dns-tcp
+    port: 53
+    protocol: TCP
+    targetPort: dns-tcp
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  loadBalancerIP: 10.1.51.200

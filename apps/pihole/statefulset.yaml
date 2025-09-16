@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pihole
+  namespace: pihole
+  labels:
+    app: pihole
+spec:
+  serviceName: pihole-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: pihole
+        image: pihole/pihole:latest
+        ports:
+        - name: dns-udp
+          containerPort: 53
+          protocol: UDP
+        - name: dns-tcp
+          containerPort: 53
+          protocol: TCP
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        env:
+        - name: FTLCONF_webserver_api_password
+          valueFrom:
+            secretKeyRef:
+              name: pihole-secret
+              key: FTLCONF_webserver_api_password
+        - name: API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: pihole-secret
+              key: API_TOKEN
+        envFrom:
+        - configMapRef:
+            name: pihole-config
+        volumeMounts:
+        - name: etc-pihole
+          mountPath: /etc/pihole
+        - name: etc-dnsmasq
+          mountPath: /etc/dnsmasq.d
+        - name: var-log
+          mountPath: /var/log
+        - name: run-log
+          mountPath: /run/log
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /admin/
+            port: 80
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /admin/
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - SYS_NICE
+      volumes:
+      - name: etc-pihole
+        emptyDir: {}
+      - name: etc-dnsmasq
+        emptyDir: {}
+      - name: var-log
+        emptyDir: {}
+      - name: run-log
+        emptyDir: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: pihole-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 4Gi

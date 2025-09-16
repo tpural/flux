@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-config
+  namespace: pihole
+data:
+  PIHOLE_DNS_: "8.8.8.8;8.8.4.4"
+  PIHOLE_INTERFACE_: "eth0"
+  PIHOLE_UID_: "1000"
+  PIHOLE_GID_: "1000"
+  TZ_: "CST"
+  WEBTHEME_: "default-dark"
+  VIRTUAL_HOST_: "pihole.local"
+  ServerIP_: "127.0.0.1"
+  IPv6_: "false"
+  DNS1_: "8.8.8.8"
+  DNS2_: "8.8.4.4"
+  DNSSEC_: "true"
+  DNSMASQ_LISTENING_: "local"
+  REV_SERVER_: "false"
+  WEBPASSWORD_: ""
+  CONDITIONAL_FORWARDING_: "false"
+  FTLCONF_LOCAL_IPV4_: "127.0.0.1"
+  FTLCONF_LOCAL_IPV6_: "::1"
+  FTLCONF_REPLY_ADDR4_: "127.0.0.1"
+  FTLCONF_REPLY_ADDR6_: "::1"
