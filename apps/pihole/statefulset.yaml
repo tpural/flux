@@ -46,9 +46,9 @@ spec:
         - configMapRef:
             name: pihole-config
         volumeMounts:
-        - name: etc-pihole
+        - name: pihole-data
           mountPath: /etc/pihole
-        - name: etc-dnsmasq
+        - name: pihole-data
           mountPath: /etc/dnsmasq.d
         - name: var-log
           mountPath: /var/log
@@ -79,10 +79,6 @@ spec:
             - NET_ADMIN
             - SYS_NICE
       volumes:
-      - name: etc-pihole
-        emptyDir: {}
-      - name: etc-dnsmasq
-        emptyDir: {}
       - name: var-log
         emptyDir: {}
       - name: run-log
