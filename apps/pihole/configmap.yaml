@@ -10,7 +10,7 @@ data:
   PIHOLE_GID_: "1000"
   TZ_: "CST"
   WEBTHEME_: "default-dark"
-  VIRTUAL_HOST_: "pihole.local"
+  VIRTUAL_HOST_: "10.1.51.200"
   ServerIP_: "127.0.0.1"
   IPv6_: "false"
   DNS1_: "8.8.8.8"
