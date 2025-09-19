@@ -25,5 +25,6 @@ data:
   FTLCONF_REPLY_ADDR4_: "127.0.0.1"
   FTLCONF_REPLY_ADDR6_: "::1"
   FTLCONF_webserver_api_enabled_: "true"
+  FTLCONF_webserver_api_app_sudo_: "true"
   FTLCONF_QUERY_LOGGING_: "true"
   FTLCONF_PRIVACYLEVEL_: "0"

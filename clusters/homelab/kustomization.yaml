@@ -6,6 +6,7 @@ resources:
 - ../../apps/kubernetes-api-lb/flux.yaml
 - ../../apps/metrics-server/flux.yaml
 - ../../apps/pihole/flux.yaml
+- ../../apps/externaldns/flux.yaml
 
 components:
 - config/metallb
