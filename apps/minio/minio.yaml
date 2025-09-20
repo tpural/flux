@@ -1,0 +1,58 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: minio
+  namespace: flux-system
+spec:
+  interval: 5m
+  url: https://charts.min.io/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minio
+  namespace: flux-system
+spec:
+  interval: 5m
+  releaseName: minio
+  targetNamespace: minio
+  chart:
+    spec:
+      chart: minio
+      version: '5.2.0'
+      sourceRef:
+        kind: HelmRepository
+        name: minio
+        namespace: flux-system
+  install:
+    createNamespace: true
+  values:
+    auth:
+      existingSecret: minio-credentials
+    defaultBuckets: "app-data,backups,media"
+    persistence:
+      enabled: true
+      storageClass: "nfs-client-retain"
+      size: 100Gi
+    service:
+      type: ClusterIP
+      port: 9000
+    consoleService:
+      type: LoadBalancer
+      port: 9001
+      loadBalancerIP: 10.1.51.201
+      annotations:
+        metallb.universe.tf/address-pool: homelab-pool
+        external-dns.alpha.kubernetes.io/hostname: minio.lan.tapslab.com
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+    securityContext:
+      enabled: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
