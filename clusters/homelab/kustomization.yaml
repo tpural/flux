@@ -8,6 +8,8 @@ resources:
 - ../../apps/pihole/flux.yaml
 - ../../apps/externaldns/flux.yaml
 - ../../apps/minio/flux.yaml
+- ../../apps/cert-manager/flux.yaml
 
 components:
 - config/metallb
+- config/cert-manager
