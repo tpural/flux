@@ -27,6 +27,8 @@ spec:
   install:
     createNamespace: true
   values:
+    mode: standalone
+    replicas: 1
     auth:
       existingSecret: minio-credentials
     defaultBuckets: "app-data,backups,media"
@@ -39,7 +41,7 @@ spec:
       port: 9000
     consoleService:
       type: LoadBalancer
-      port: 9001
+      port: 80
       loadBalancerIP: 10.1.51.201
       annotations:
         metallb.universe.tf/address-pool: homelab-pool
