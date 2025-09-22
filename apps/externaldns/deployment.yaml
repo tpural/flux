@@ -28,6 +28,7 @@ spec:
         - --pihole-tls-skip-verify
         - --pihole-api-version=6
         - --domain-filter=local
+        - --domain-filter=lan.tapslab.com
         - --log-format=json
         - --log-level=info
         - --interval=30s
