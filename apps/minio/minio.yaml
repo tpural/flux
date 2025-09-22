@@ -30,7 +30,7 @@ spec:
     mode: standalone
     replicas: 1
     auth:
-      existingSecret: minio-credentials
+      existingSecret: minio
     defaultBuckets: "app-data,backups,media"
     persistence:
       enabled: true
