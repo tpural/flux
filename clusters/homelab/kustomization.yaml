@@ -9,6 +9,8 @@ resources:
 - ../../apps/externaldns/flux.yaml
 - ../../apps/minio/flux.yaml
 - ../../apps/cert-manager/flux.yaml
+- ../../apps/gateway-api/flux.yaml
+- ../../apps/istio-system/flux.yaml
 
 components:
 - config/metallb
