@@ -19,10 +19,16 @@ spec:
     port: 80
     protocol: HTTP
     hostname: "*.lan.tapslab.com"
+    allowedRoutes:
+      namespaces:
+        from: All
   - name: https
     port: 443
     protocol: HTTPS
     hostname: "*.lan.tapslab.com"
+    allowedRoutes:
+      namespaces:
+        from: All
     tls:
       mode: Terminate
       certificateRefs:
