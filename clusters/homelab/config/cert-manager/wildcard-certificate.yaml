@@ -6,7 +6,7 @@ metadata:
 spec:
   secretName: lan-tapslab-com-wildcard-tls
   issuerRef:
-    name: letsencrypt-dns01-staging
+    name: letsencrypt-dns01-prod
     kind: ClusterIssuer
   dnsNames:
   - "*.lan.tapslab.com"
@@ -18,7 +18,7 @@ metadata:
   name: example-service-ingress
   namespace: default
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-dns01-staging
+    cert-manager.io/cluster-issuer: letsencrypt-dns01-prod
 spec:
   tls:
   - hosts:
