@@ -1,0 +1,31 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: istio
+spec:
+  controllerName: istio.io/gateway-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: default-gateway
+  namespace: istio-system
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns01-staging
+spec:
+  gatewayClassName: istio
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+    hostname: "*.lan.tapslab.com"
+  - name: https
+    port: 443
+    protocol: HTTPS
+    hostname: "*.lan.tapslab.com"
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        name: default-gateway-tls
+        namespace: istio-system

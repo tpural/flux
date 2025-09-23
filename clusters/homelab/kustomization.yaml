@@ -15,3 +15,4 @@ resources:
 components:
 - config/metallb
 - config/cert-manager
+- config/gateway-api
