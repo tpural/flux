@@ -5,4 +5,4 @@ resources:
 - secret.yaml
 - minio.yaml
 - policies.yaml
-- ingress.yaml
+- httproute.yaml
