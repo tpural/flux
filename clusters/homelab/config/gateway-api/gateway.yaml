@@ -33,5 +33,5 @@ spec:
       mode: Terminate
       certificateRefs:
       - kind: Secret
-        name: default-gateway-tls
-        namespace: istio-system
+        name: lan-tapslab-com-wildcard-tls
+        namespace: cert-manager
