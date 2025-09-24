@@ -40,11 +40,8 @@ spec:
       type: ClusterIP
       port: 9000
     consoleService:
-      type: LoadBalancer
+      type: ClusterIP
       port: 80
-      loadBalancerIP: 10.1.51.201
-      annotations:
-        metallb.universe.tf/address-pool: homelab-pool
     resources:
       requests:
         memory: 512Mi
