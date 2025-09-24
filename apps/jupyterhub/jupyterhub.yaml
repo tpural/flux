@@ -65,6 +65,14 @@ spec:
           JupyterHub:
             login_rate_limit: 5
             login_rate_limit_window: 300
+          KubeSpawner:
+            storage_pvc_ensure_timeout: 300
+            http_timeout: 600
+            start_timeout: 1200
+            request_timeout: 600
+            api_timeout: 600
+            k8s_api_request_timeout: 600
+            k8s_api_host: "https://kubernetes-api-lb.default.svc.cluster.local:6443"
       service:
         type: ClusterIP
       resources:
@@ -92,6 +100,8 @@ spec:
         capacity: 10Gi
         dynamic:
           storageClass: nfs-client-retain
+          volumeNameTemplate: "volume-{username}"
+      startTimeout: 600
     prePuller:
       hook:
         enabled: true
