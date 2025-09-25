@@ -33,6 +33,10 @@ spec:
       targetPath: hub.config.DummyAuthenticator.password
   values:
     hub:
+      networkPolicy:
+        enabled: true
+        egress:
+          - {}  # Allow all egress traffic
       config:
         JupyterHub:
           authenticator_class: 'jupyterhub.auth.DummyAuthenticator'
