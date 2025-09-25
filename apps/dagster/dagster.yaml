@@ -1,0 +1,139 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: dagster
+  namespace: flux-system
+spec:
+  interval: 5m
+  url: https://dagster-io.github.io/helm
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: dagster
+  namespace: flux-system
+spec:
+  interval: 5m
+  releaseName: dagster
+  targetNamespace: dagster
+  chart:
+    spec:
+      chart: dagster
+      version: '1.0.0'
+      sourceRef:
+        kind: HelmRepository
+        name: dagster
+        namespace: flux-system
+  install:
+    createNamespace: true
+  values:
+    dagster:
+      image:
+        repository: dagster/dagster
+        tag: '1.7.0'
+      dagsterHome: /opt/dagster/dagster_home
+      storage:
+        postgresql:
+          enabled: true
+          postgresqlHost: dagster-postgresql
+          postgresqlDatabase: dagster
+          postgresqlUsername: tpural
+          existingSecret: dagster-secret
+          postgresqlPasswordKey: postgres_password
+      codeLocations:
+        default:
+          image:
+            repository: dagster/dagster
+            tag: '1.7.0'
+          codeSource:
+            pythonFile: /opt/dagster/app/repo.py
+      runLauncher:
+        type: K8sRunLauncher
+        config:
+          jobNamespace: dagster
+          loadInclusterConfig: true
+          kubeconfigFile: null
+          imagePullPolicy: IfNotPresent
+          serviceAccountName: dagster
+          imagePullSecrets: []
+          envConfigMaps: []
+          envSecrets: []
+          envVars: []
+          volumeMounts: []
+          volumes: []
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      scheduler:
+        enabled: true
+        type: DagsterDaemonScheduler
+      webserver:
+        enabled: true
+        image:
+          repository: dagster/dagster-webserver
+          tag: '1.7.0'
+        service:
+          type: LoadBalancer
+          port: 3000
+          annotations:
+            metallb.universe.tf/address-pool: homelab-pool
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        nodeSelector:
+          kubernetes.io/arch: arm64
+        env:
+          - name: DAGSTER_UI_USERNAME
+            value: "admin"
+          - name: DAGSTER_UI_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: dagster-secret
+                key: ui_password
+      daemon:
+        enabled: true
+        image:
+          repository: dagster/dagster-daemon
+          tag: '1.7.0'
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        nodeSelector:
+          kubernetes.io/arch: arm64
+      userDeployments:
+        enabled: false
+    postgresql:
+      enabled: true
+      auth:
+        username: tpural
+        database: dagster
+        existingSecret: dagster-secret
+        secretKeys:
+          adminPasswordKey: postgres_password
+          userPasswordKey: postgres_password
+      primary:
+        persistence:
+          enabled: true
+          size: 10Gi
+          storageClass: nfs-client-retain
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        nodeSelector:
+          kubernetes.io/arch: arm64
