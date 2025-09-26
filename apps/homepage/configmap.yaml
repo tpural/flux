@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-config
+  namespace: homepage
+data:
+  services.yaml: |
+    - Pihole:
+        href: http://10.1.51.200
+        description: Network-wide ad blocking
+        icon: pihole.png
+    - MinIO:
+        href: https://minio.lan.tapslab.com
+        description: Object storage
+        icon: minio.png
+    - JupyterHub:
+        href: https://jupyterhub.lan.tapslab.com
+        description: Jupyter notebooks
+        icon: jupyter.png
+    - Dagster:
+        href: https://dagster.lan.tapslab.com
+        description: Data orchestration
+        icon: dagster.png
+  bookmarks.yaml: |
+    - Developer:
+        - GitHub:
+            href: https://github.com
+            icon: github.png
+    - Cloud Services:
+        - Cloudflare:
+            href: https://dash.cloudflare.com
+            icon: cloudflare.png
+  settings.yaml: |
+    title: TAPSLAB Dashboard
+    subtitle: 
+    logo: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/homepage.png
+    favicon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/homepage.png
+    background: https://images.unsplash.com/photo-1557683316-973673baf926
+    theme: dark
+    language: en
+    layout: auto
+    iconStyle: light
+    showStats: true
+    showGreeting: true
+    showTime: true
+    showDate: true
+    showWeather: false
+    showSearch: true

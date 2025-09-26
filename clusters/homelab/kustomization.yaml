@@ -13,6 +13,7 @@ resources:
 - ../../apps/istio-system/flux.yaml
 - ../../apps/jupyterhub/flux.yaml
 - ../../apps/dagster/flux.yaml
+- ../../apps/homepage/flux.yaml
 
 components:
 - config/metallb
