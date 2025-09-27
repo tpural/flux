@@ -15,6 +15,7 @@ spec:
       labels:
         app: homepage
     spec:
+      serviceAccountName: homepage
       containers:
       - name: homepage
         image: ghcr.io/gethomepage/homepage:latest
@@ -31,8 +32,6 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /app/config
-        - name: logs
-          mountPath: /app/config/logs
         resources:
           requests:
             memory: "64Mi"
@@ -44,5 +43,3 @@ spec:
       - name: config
         configMap:
           name: homepage-config
-      - name: logs
-        emptyDir: {}

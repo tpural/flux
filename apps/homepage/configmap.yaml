@@ -9,18 +9,26 @@ data:
         href: http://10.1.51.200
         description: Network-wide ad blocking
         icon: pihole.png
+        namespace: pihole
+        app: pihole
     - MinIO:
         href: https://minio.lan.tapslab.com
         description: Object storage
         icon: minio.png
+        namespace: minio
+        app: minio
     - JupyterHub:
         href: https://jupyterhub.lan.tapslab.com
         description: Jupyter notebooks
         icon: jupyter.png
+        namespace: jupyterhub
+        app: jupyterhub
     - Dagster:
         href: https://dagster.lan.tapslab.com
         description: Data orchestration
         icon: dagster.png
+        namespace: dagster
+        app: dagster
   bookmarks.yaml: |
     - Developer:
         - GitHub:
@@ -46,3 +54,5 @@ data:
     showDate: true
     showWeather: false
     showSearch: true
+  kubernetes.yaml: |
+    mode: cluster
