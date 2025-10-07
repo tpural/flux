@@ -1,0 +1,18 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: openwebui
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  path: ./apps/openwebui
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  targetNamespace: openwebui
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+  wait: true

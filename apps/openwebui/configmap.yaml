@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openwebui-config
+  namespace: openwebui
+data:
+  .env: |
+    OLLAMA_BASE_URL=http://10.1.51.75:11434
+    OPENAI_API_BASE_URL=http://10.1.51.75:11434/v1
+    OPENAI_API_KEY=ollama
+    ENABLE_SIGNUP=true
+    DEFAULT_USER_ROLE=user
+    ENABLE_COMMUNITY_SHARING=false
+    ENABLE_MESSAGE_RATING=true
+    ENABLE_MODEL_FILTER=true
+    ENABLE_ADMIN_EXPORT=true
+    ENABLE_ADMIN_CHAT_ACCESS=true
+    ENABLE_ADMIN_USER_MANAGEMENT=true
+    ENABLE_OPENAI_API=true
+    ENABLE_OPENAI_API_BASE_URL=http://10.1.51.75:11434/v1
+    ENABLE_OPENAI_API_KEY=ollama
+    WEBUI_AUTH=true
+    ENABLE_LIGHT_MODE=true
+    ENABLE_CHAT_HISTORY=true
+    ENABLE_MODEL_FILTER=true
+    ENABLE_ADMIN_CHAT_ACCESS=true

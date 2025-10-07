@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openwebui
+  namespace: openwebui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openwebui
+  template:
+    metadata:
+      labels:
+        app: openwebui
+    spec:
+      containers:
+      - name: openwebui
+        image: ghcr.io/open-webui/open-webui:main
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: OLLAMA_BASE_URL
+          value: "http://10.1.51.75:11434"
+        - name: WEBUI_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openwebui-secret
+              key: WEBUI_SECRET_KEY
+        - name: OPENAI_API_BASE_URL
+          value: "http://10.1.51.75:11434/v1"
+        - name: OPENAI_API_KEY
+          value: "ollama"
+        - name: WEBUI_JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openwebui-secret
+              key: WEBUI_JWT_SECRET_KEY
+        - name: ENABLE_SIGNUP
+          value: "true"
+        - name: DEFAULT_USER_ROLE
+          value: "user"
+        - name: ENABLE_COMMUNITY_SHARING
+          value: "false"
+        - name: ENABLE_MESSAGE_RATING
+          value: "true"
+        - name: ENABLE_MODEL_FILTER
+          value: "true"
+        - name: ENABLE_ADMIN_EXPORT
+          value: "true"
+        - name: ENABLE_ADMIN_CHAT_ACCESS
+          value: "true"
+        - name: ENABLE_ADMIN_USER_MANAGEMENT
+          value: "true"
+        - name: ENABLE_OPENAI_API
+          value: "true"
+        - name: ENABLE_OPENAI_API_BASE_URL
+          value: "http://10.1.51.75:11434/v1"
+        - name: ENABLE_OPENAI_API_KEY
+          value: "ollama"
+        volumeMounts:
+        - name: data
+          mountPath: /app/backend/data
+        - name: config
+          mountPath: /app/backend/.env
+          subPath: .env
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: openwebui-data
+      - name: config
+        configMap:
+          name: openwebui-config
