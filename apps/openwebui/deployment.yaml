@@ -58,6 +58,10 @@ spec:
           value: "http://10.1.51.75:11434/v1"
         - name: ENABLE_OPENAI_API_KEY
           value: "ollama"
+        - name: ENABLE_LOCAL_MODEL_DOWNLOAD
+          value: "false"
+        - name: ENABLE_LOCAL_MODEL_UPLOAD
+          value: "false"
         volumeMounts:
         - name: data
           mountPath: /app/backend/data
