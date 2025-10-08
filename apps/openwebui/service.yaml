@@ -3,7 +3,10 @@ kind: Service
 metadata:
   name: openwebui
   namespace: openwebui
+  annotations:
+    metallb.universe.tf/address-pool: homelab-pool
 spec:
+  type: LoadBalancer
   ports:
   - port: 80
     targetPort: http
