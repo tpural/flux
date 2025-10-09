@@ -5,3 +5,4 @@ resources:
 - secret.yaml
 - jupyterhub.yaml
 - httproute.yaml
+- networkpolicy.yaml
