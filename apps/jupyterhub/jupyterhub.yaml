@@ -133,6 +133,9 @@ spec:
           storageClass: nfs-client-retain
           volumeNameTemplate: "volume-{username}"
       startTimeout: 600
+    scheduling:
+      userScheduler:
+        enabled: false
     prePuller:
       hook:
         enabled: true
