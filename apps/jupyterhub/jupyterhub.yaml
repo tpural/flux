@@ -65,6 +65,33 @@ spec:
                 cpu_limit: 1.0
                 mem_guarantee: "512M"
                 cpu_guarantee: 0.25
+            - display_name: "GPU - NVIDIA RTX 3090"
+              description: "24GB GPU RAM, 8GB System RAM - ML/AI workloads"
+              kubespawner_override:
+                node_selector:
+                  nvidia.com/gpu: "true"
+                mem_limit: "8G"
+                cpu_limit: 4.0
+                mem_guarantee: "2G"
+                cpu_guarantee: 1.0
+                image: jupyter/scipy-notebook:latest
+                environment:
+                  NVIDIA_VISIBLE_DEVICES: "all"
+                  NVIDIA_DRIVER_CAPABILITIES: "compute,utility"
+                  LD_LIBRARY_PATH: "/usr/local/nvidia"
+                volume_mounts:
+                  - name: nvidia-libs
+                    mount_path: /usr/local/nvidia
+                    read_only: true
+                  - name: nvidia-dev
+                    mount_path: /dev
+                volumes:
+                  - name: nvidia-libs
+                    host_path:
+                      path: /usr/lib/wsl/lib
+                  - name: nvidia-dev
+                    host_path:
+                      path: /dev
         c:
           JupyterHub:
             login_rate_limit: 5
