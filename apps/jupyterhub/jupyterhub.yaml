@@ -75,6 +75,7 @@ spec:
                 mem_guarantee: "2G"
                 cpu_guarantee: 1.0
                 image: jupyter/scipy-notebook:latest
+                runtime_class: nvidia
                 environment:
                   NVIDIA_VISIBLE_DEVICES: "all"
                   NVIDIA_DRIVER_CAPABILITIES: "compute,utility"
