@@ -82,13 +82,13 @@ spec:
                   LD_LIBRARY_PATH: "/usr/local/nvidia"
                 privileged: true
                 allow_privilege_escalation: true
-                volume_mounts:
+                extra_volume_mounts:
                   - name: nvidia-libs
                     mount_path: /usr/local/nvidia
                     read_only: true
                   - name: nvidia-dev
                     mount_path: /dev
-                volumes:
+                extra_volumes:
                   - name: nvidia-libs
                     host_path:
                       path: /usr/lib/wsl/lib
