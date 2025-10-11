@@ -136,6 +136,18 @@ spec:
           storageClass: nfs-client-retain
           volumeNameTemplate: "volume-{username}"
       startTimeout: 600
+      extraEnv:
+        JUPYTER_ENABLE_LAB: "yes"
+        OPENWEBUI_URL:
+          valueFrom:
+            secretKeyRef:
+              name: user-environment-secrets
+              key: OPENWEBUI_URL
+        OPENWEBUI_KEY:
+          valueFrom:
+            secretKeyRef:
+              name: user-environment-secrets
+              key: OPENWEBUI_KEY
     scheduling:
       userScheduler:
         enabled: false

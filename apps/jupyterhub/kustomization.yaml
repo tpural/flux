@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - namespace.yaml
 - secret.yaml
+- user-secrets.yaml
 - jupyterhub.yaml
 - httproute.yaml
 - networkpolicy.yaml
