@@ -1,0 +1,46 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: cloudflare-operator
+  namespace: flux-system
+spec:
+  interval: 1h
+  ref:
+    tag: v0.13.1
+  url: https://github.com/adyanth/cloudflare-operator
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cloudflare-operator-resources
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./apps/cloudflare-operator
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cloudflare-operator
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: cloudflare-operator-resources
+  interval: 10m
+  path: ./config/default
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: cloudflare-operator
+    namespace: flux-system
+  targetNamespace: cloudflare-operator
+  timeout: 2m

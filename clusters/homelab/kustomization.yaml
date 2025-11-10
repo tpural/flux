@@ -14,6 +14,7 @@ resources:
 - ../../apps/jupyterhub/flux.yaml
 - ../../apps/dagster/flux.yaml
 - ../../apps/openwebui/flux.yaml
+- ../../apps/cloudflare-operator/flux.yaml
 
 components:
 - config/metallb
