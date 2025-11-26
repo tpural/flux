@@ -15,6 +15,7 @@ resources:
 - ../../apps/dagster/flux.yaml
 - ../../apps/openwebui/flux.yaml
 - ../../apps/cloudflare-operator/flux.yaml
+- ../../apps/portfolio-site/flux.yaml
 
 components:
 - config/metallb

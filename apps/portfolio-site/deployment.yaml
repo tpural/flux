@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portfolio-site
+  namespace: portfolio-site
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portfolio-site
+  template:
+    metadata:
+      labels:
+        app: portfolio-site
+    spec:
+      serviceAccountName: portfolio-site
+      containers:
+        - name: portfolio-site
+          image: ghcr.io/tpural/portfolio-site:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: portfolio-data
+              mountPath: /app/backend/data
+      volumes:
+        - name: portfolio-data
+          persistentVolumeClaim:
+            claimName: portfolio-data-pvc
+
+
+
