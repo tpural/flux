@@ -12,10 +12,27 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cloudflare-operator-resources
+  name: cloudflare-operator-crds
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 10m
+  path: ./config/crd
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: cloudflare-operator
+    namespace: flux-system
+  timeout: 2m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cloudflare-operator
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: cloudflare-operator-crds
+  interval: 10m
   path: ./apps/cloudflare-operator
   prune: true
   sourceRef:
@@ -26,21 +43,3 @@ spec:
     provider: sops
     secretRef:
       name: sops-age
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: cloudflare-operator
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: cloudflare-operator-resources
-  interval: 10m
-  path: ./config/default
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: cloudflare-operator
-    namespace: flux-system
-  targetNamespace: cloudflare-operator
-  timeout: 2m
