@@ -1,0 +1,12 @@
+apiVersion: networking.cfargotunnel.com/v1alpha1
+kind: Tunnel
+metadata:
+  name: portfolio-site-tunnel
+  namespace: cloudflare-operator
+spec:
+  cloudflare:
+    secret: cloudflare-api-token
+    domain: tapslab.com
+  newTunnel:
+    name: portfolio-site-tunnel
+
