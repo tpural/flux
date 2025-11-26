@@ -19,7 +19,7 @@ spec:
           image: ghcr.io/tpural/portfolio-site:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - containerPort: 80
               name: http
           volumeMounts:
             - name: portfolio-data

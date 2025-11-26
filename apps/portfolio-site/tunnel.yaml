@@ -2,7 +2,7 @@ apiVersion: networking.cfargotunnel.com/v1alpha2
 kind: Tunnel
 metadata:
   name: portfolio-site-tunnel
-  namespace: cloudflare-operator
+  namespace: portfolio-site
 spec:
   cloudflare:
     secret: cloudflare-api-token
