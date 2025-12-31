@@ -1,16 +1,15 @@
 apiVersion: networking.cfargotunnel.com/v1alpha1
 kind: TunnelBinding
 metadata:
-  name: portfolio-site-binding
-  namespace: portfolio-site
+  name: angelorooms-binding
+  namespace: angelorooms
 tunnelRef:
   kind: Tunnel
-  name: portfolio-site-tunnel
+  name: angelorooms-tunnel
 subjects:
   - kind: Service
-    name: portfolio-site
+    name: angelorooms
     spec:
       fqdn: angelorooms.com
       path: /
       protocol: http
-

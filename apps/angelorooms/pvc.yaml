@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: portfolio-data-pvc
-  namespace: portfolio-site
+  name: angelorooms-data-pvc
+  namespace: angelorooms
 spec:
   accessModes:
     - ReadWriteMany
@@ -10,6 +10,3 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: nfs-client-retain
-
-
-

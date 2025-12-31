@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: portfolio-site
-  namespace: portfolio-site
+  name: angelorooms
+  namespace: angelorooms
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: portfolio-site
+      app: angelorooms
   template:
     metadata:
       labels:
-        app: portfolio-site
+        app: angelorooms
     spec:
-      serviceAccountName: portfolio-site
+      serviceAccountName: angelorooms
       containers:
-        - name: portfolio-site
+        - name: angelorooms
           image: ghcr.io/tpural/portfolio-site:latest
           imagePullPolicy: Always
           ports:
@@ -25,35 +25,32 @@ spec:
             - name: GOOGLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: portfolio-auth-secret
+                  name: angelorooms-auth-secret
                   key: GOOGLE_CLIENT_ID
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: portfolio-auth-secret
+                  name: angelorooms-auth-secret
                   key: JWT_SECRET
             - name: ALLOWED_EMAILS
               valueFrom:
                 secretKeyRef:
-                  name: portfolio-auth-secret
+                  name: angelorooms-auth-secret
                   key: ALLOWED_EMAILS
             - name: ALLOWED_ORIGINS
               valueFrom:
                 secretKeyRef:
-                  name: portfolio-auth-secret
+                  name: angelorooms-auth-secret
                   key: ALLOWED_ORIGINS
             - name: NEXT_PUBLIC_GOOGLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: portfolio-auth-secret
+                  name: angelorooms-auth-secret
                   key: NEXT_PUBLIC_GOOGLE_CLIENT_ID
           volumeMounts:
-            - name: portfolio-data
+            - name: angelorooms-data
               mountPath: /app/backend/data
       volumes:
-        - name: portfolio-data
+        - name: angelorooms-data
           persistentVolumeClaim:
-            claimName: portfolio-data-pvc
-
-
-
+            claimName: angelorooms-data-pvc
