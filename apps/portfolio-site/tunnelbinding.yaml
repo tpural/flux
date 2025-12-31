@@ -10,7 +10,7 @@ subjects:
   - kind: Service
     name: portfolio-site
     spec:
-      fqdn: portfolio-site.tapslab.com
+      fqdn: angelorooms.com
       path: /
       protocol: http
 

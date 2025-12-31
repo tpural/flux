@@ -21,6 +21,32 @@ spec:
           ports:
             - containerPort: 80
               name: http
+          env:
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: portfolio-auth-secret
+                  key: GOOGLE_CLIENT_ID
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: portfolio-auth-secret
+                  key: JWT_SECRET
+            - name: ALLOWED_EMAILS
+              valueFrom:
+                secretKeyRef:
+                  name: portfolio-auth-secret
+                  key: ALLOWED_EMAILS
+            - name: ALLOWED_ORIGINS
+              valueFrom:
+                secretKeyRef:
+                  name: portfolio-auth-secret
+                  key: ALLOWED_ORIGINS
+            - name: NEXT_PUBLIC_GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: portfolio-auth-secret
+                  key: NEXT_PUBLIC_GOOGLE_CLIENT_ID
           volumeMounts:
             - name: portfolio-data
               mountPath: /app/backend/data

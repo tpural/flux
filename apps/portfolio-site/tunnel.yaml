@@ -6,7 +6,7 @@ metadata:
 spec:
   cloudflare:
     secret: cloudflare-api-token
-    domain: tapslab.com
+    domain: angelorooms.com
     accountId: "a5381a9e7dc8006a86499f0bba4d1183" 
   newTunnel:
     name: portfolio-site-tunnel
