@@ -16,7 +16,7 @@ spec:
       serviceAccountName: angelorooms
       containers:
         - name: angelorooms
-          image: ghcr.io/tpural/portfolio-site:latest
+          image: ghcr.io/tpural/portfolio-site:1.0.0
           imagePullPolicy: Always
           ports:
             - containerPort: 80
