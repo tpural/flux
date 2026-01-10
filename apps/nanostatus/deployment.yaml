@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nanostatus
+  namespace: nanostatus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nanostatus
+  template:
+    metadata:
+      labels:
+        app: nanostatus
+    spec:
+      serviceAccountName: nanostatus
+      containers:
+        - name: nanostatus
+          image: gjames8/nanostatus:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nanostatus-data
+              mountPath: /data
+      volumes:
+        - name: nanostatus-data
+          persistentVolumeClaim:
+            claimName: nanostatus-data-pvc
