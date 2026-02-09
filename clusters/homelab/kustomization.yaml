@@ -17,6 +17,7 @@ resources:
 - ../../apps/cloudflare-operator/flux.yaml
 - ../../apps/angelorooms/flux.yaml
 - ../../apps/nanostatus/flux.yaml
+- ../../apps/home-assistant/flux.yaml
 
 components:
 - config/metallb
