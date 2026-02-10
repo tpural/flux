@@ -22,6 +22,10 @@ spec:
     kind: GitRepository
     name: home-assistant
   timeout: 5m
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment

@@ -6,3 +6,6 @@ resources:
 - pvc.yaml
 - deployment.yaml
 - service.yaml
+- cloudflare-secret.yaml
+- tunnel.yaml
+- tunnelbinding.yaml

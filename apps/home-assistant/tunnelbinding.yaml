@@ -1,0 +1,15 @@
+apiVersion: networking.cfargotunnel.com/v1alpha1
+kind: TunnelBinding
+metadata:
+  name: home-assistant-binding
+  namespace: home-assistant
+tunnelRef:
+  kind: Tunnel
+  name: home-assistant-tunnel
+subjects:
+  - kind: Service
+    name: home-assistant-lb
+    spec:
+      fqdn: home-assistant.tapslab.com
+      path: /
+      protocol: http

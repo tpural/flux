@@ -1,0 +1,12 @@
+apiVersion: networking.cfargotunnel.com/v1alpha2
+kind: Tunnel
+metadata:
+  name: home-assistant-tunnel
+  namespace: home-assistant
+spec:
+  cloudflare:
+    secret: cloudflare-api-token
+    domain: tapslab.com
+    accountId: "a5381a9e7dc8006a86499f0bba4d1183"
+  newTunnel:
+    name: home-assistant-tunnel
