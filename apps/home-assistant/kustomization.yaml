@@ -9,3 +9,9 @@ resources:
 - cloudflare-secret.yaml
 - tunnel.yaml
 - tunnelbinding.yaml
+- whisper-pvc.yaml
+- whisper-deployment.yaml
+- whisper-service.yaml
+- piper-pvc.yaml
+- piper-deployment.yaml
+- piper-service.yaml

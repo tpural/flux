@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: piper
+  namespace: home-assistant
+  labels:
+    app: piper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: piper
+  template:
+    metadata:
+      labels:
+        app: piper
+    spec:
+      containers:
+      - name: piper
+        image: rhasspy/wyoming-piper
+        args:
+        - --voice
+        - en_US-lessac-medium
+        ports:
+        - containerPort: 10200
+          name: wyoming
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: piper-data

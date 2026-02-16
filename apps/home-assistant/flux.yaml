@@ -35,3 +35,11 @@ spec:
       kind: Service
       name: home-assistant-lb
       namespace: home-assistant
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: whisper
+      namespace: home-assistant
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: piper
+      namespace: home-assistant
