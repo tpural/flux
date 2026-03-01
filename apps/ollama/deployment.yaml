@@ -29,10 +29,9 @@ spec:
               mountPath: /root/.ollama
           resources:
             requests:
-              memory: "4Gi"
+              memory: "8Gi"
               cpu: "1"
             limits:
-              memory: "16Gi"
               nvidia.com/gpu: 1
           livenessProbe:
             httpGet:
