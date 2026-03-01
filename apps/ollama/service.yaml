@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+  namespace: ollama
+  annotations:
+    metallb.universe.tf/address-pool: homelab-pool
+    external-dns.alpha.kubernetes.io/hostname: ollama.lan.tapslab.com
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 11434
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: ollama

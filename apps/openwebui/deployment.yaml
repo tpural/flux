@@ -21,14 +21,14 @@ spec:
           name: http
         env:
         - name: OLLAMA_BASE_URL
-          value: "http://10.1.51.75:11434"
+          value: "http://ollama.ollama.svc.cluster.local:11434"
         - name: WEBUI_SECRET_KEY
           valueFrom:
             secretKeyRef:
               name: openwebui-secret
               key: WEBUI_SECRET_KEY
         - name: OPENAI_API_BASE_URL
-          value: "http://10.1.51.75:11434/v1"
+          value: "http://ollama.ollama.svc.cluster.local:11434/v1"
         - name: OPENAI_API_KEY
           value: "ollama"
         - name: WEBUI_JWT_SECRET_KEY
@@ -55,7 +55,7 @@ spec:
         - name: ENABLE_OPENAI_API
           value: "true"
         - name: ENABLE_OPENAI_API_BASE_URL
-          value: "http://10.1.51.75:11434/v1"
+          value: "http://ollama.ollama.svc.cluster.local:11434/v1"
         - name: ENABLE_OPENAI_API_KEY
           value: "ollama"
         - name: ENABLE_LOCAL_MODEL_DOWNLOAD

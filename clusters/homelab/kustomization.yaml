@@ -16,6 +16,7 @@ resources:
 - ../../apps/nanostatus/flux.yaml
 - ../../apps/home-assistant/flux.yaml
 - ../../apps/gpu-operator/flux.yaml
+- ../../apps/ollama/flux.yaml
 
 components:
 - config/metallb

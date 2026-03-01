@@ -5,8 +5,8 @@ metadata:
   namespace: openwebui
 data:
   .env: |
-    OLLAMA_BASE_URL=http://10.1.51.75:11434
-    OPENAI_API_BASE_URL=http://10.1.51.75:11434/v1
+    OLLAMA_BASE_URL=http://ollama.ollama.svc.cluster.local:11434
+    OPENAI_API_BASE_URL=http://ollama.ollama.svc.cluster.local:11434/v1
     OPENAI_API_KEY=ollama
     ENABLE_LOCAL_MODEL_DOWNLOAD=false
     ENABLE_LOCAL_MODEL_UPLOAD=false
@@ -19,7 +19,7 @@ data:
     ENABLE_ADMIN_CHAT_ACCESS=true
     ENABLE_ADMIN_USER_MANAGEMENT=true
     ENABLE_OPENAI_API=true
-    ENABLE_OPENAI_API_BASE_URL=http://10.1.51.75:11434/v1
+    ENABLE_OPENAI_API_BASE_URL=http://ollama.ollama.svc.cluster.local:11434/v1
     ENABLE_OPENAI_API_KEY=ollama
     WEBUI_AUTH=true
     ENABLE_LIGHT_MODE=true
