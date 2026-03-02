@@ -17,6 +17,7 @@ resources:
 - ../../apps/home-assistant/flux.yaml
 - ../../apps/gpu-operator/flux.yaml
 - ../../apps/ollama/flux.yaml
+- ../../apps/n8n/flux.yaml
 
 components:
 - config/metallb
