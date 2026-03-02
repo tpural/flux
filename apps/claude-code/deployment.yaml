@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claude-code
+  namespace: claude-code
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: claude-code
+  template:
+    metadata:
+      labels:
+        app: claude-code
+    spec:
+      containers:
+        - name: claude-code
+          image: node:22-bookworm
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              apt-get update &&
+              apt-get install -y openssh-server git python3 python3-pip build-essential ripgrep &&
+              mkdir -p /run/sshd &&
+              echo "PermitRootLogin yes" >> /etc/ssh/sshd_config &&
+              echo "root:$SSH_PASSWORD" | chpasswd &&
+              npm install -g @anthropic-ai/claude-code &&
+              ln -sf /data/claude-home /root/.claude &&
+              mkdir -p /data/claude-home /data/projects &&
+              echo '{"hasCompletedOnboarding":true}' > /root/.claude.json &&
+              echo "export CLAUDE_CODE_OAUTH_TOKEN=\"$CLAUDE_CODE_OAUTH_TOKEN\"" >> /root/.bashrc &&
+              echo "export HOME=/root" >> /root/.bashrc &&
+              echo "cd /data/projects" >> /root/.bashrc &&
+              /usr/sbin/sshd &&
+              sleep infinity
+          ports:
+            - containerPort: 22
+              name: ssh
+          env:
+            - name: CLAUDE_CODE_OAUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: claude-code-auth
+                  key: CLAUDE_CODE_OAUTH_TOKEN
+            - name: SSH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: claude-code-auth
+                  key: SSH_PASSWORD
+            - name: HOME
+              value: /root
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "4Gi"
+              cpu: "1"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: claude-code-data

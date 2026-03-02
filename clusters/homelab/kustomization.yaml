@@ -18,6 +18,7 @@ resources:
 - ../../apps/gpu-operator/flux.yaml
 - ../../apps/ollama/flux.yaml
 - ../../apps/n8n/flux.yaml
+- ../../apps/claude-code/flux.yaml
 
 components:
 - config/metallb
