@@ -13,53 +13,44 @@ spec:
       labels:
         app: claude-code
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
-        - name: claude-code
-          image: node:22-bookworm
-          command: ["/bin/bash", "-c"]
-          args:
-            - |
-              apt-get update &&
-              apt-get install -y openssh-server git python3 python3-pip build-essential ripgrep &&
-              mkdir -p /run/sshd &&
-              echo "PermitRootLogin yes" >> /etc/ssh/sshd_config &&
-              echo "root:$SSH_PASSWORD" | chpasswd &&
-              npm install -g @anthropic-ai/claude-code &&
-              ln -sf /data/claude-home /root/.claude &&
-              mkdir -p /data/claude-home /data/projects &&
-              echo '{"hasCompletedOnboarding":true}' > /root/.claude.json &&
-              echo "export CLAUDE_CODE_OAUTH_TOKEN=\"$CLAUDE_CODE_OAUTH_TOKEN\"" >> /root/.bashrc &&
-              echo "export HOME=/root" >> /root/.bashrc &&
-              echo "cd /data/projects" >> /root/.bashrc &&
-              /usr/sbin/sshd &&
-              sleep infinity
+        - name: api-adapter
+          image: ghcr.io/tpural/claude-code-api-adapter:latest
           ports:
-            - containerPort: 22
-              name: ssh
+            - containerPort: 8080
+              name: http
           env:
             - name: CLAUDE_CODE_OAUTH_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: claude-code-auth
                   key: CLAUDE_CODE_OAUTH_TOKEN
-            - name: SSH_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: claude-code-auth
-                  key: SSH_PASSWORD
+            - name: PORT
+              value: "8080"
+            - name: SESSIONS_DIR
+              value: /tmp/sessions
             - name: HOME
-              value: /root
-          volumeMounts:
-            - name: data
-              mountPath: /data
+              value: /tmp
           resources:
             requests:
-              memory: "256Mi"
+              memory: "128Mi"
               cpu: "100m"
             limits:
-              memory: "4Gi"
-              cpu: "1"
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: claude-code-data
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
