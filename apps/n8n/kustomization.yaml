@@ -3,10 +3,10 @@ kind: Kustomization
 namespace: n8n
 resources:
   - namespace.yaml
-  - pvc.yaml
   - deployment.yaml
   - service.yaml
   - httproute.yaml
   - cloudflare-secret.yaml
+  - db-secret.yaml
   - tunnel.yaml
   - tunnelbinding.yaml

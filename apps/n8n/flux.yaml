@@ -4,6 +4,8 @@ metadata:
   name: n8n
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: postgres
   interval: 10m0s
   path: ./apps/n8n
   prune: true

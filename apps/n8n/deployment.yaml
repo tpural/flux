@@ -34,9 +34,26 @@ spec:
               value: "https://n8n.lan.tapslab.com/"
             - name: GENERIC_TIMEZONE
               value: "America/Chicago"
-          volumeMounts:
-            - name: data
-              mountPath: /home/node/.n8n
+            - name: DB_TYPE
+              value: "postgresdb"
+            - name: DB_POSTGRESDB_HOST
+              value: "postgres.postgres.svc.cluster.local"
+            - name: DB_POSTGRESDB_PORT
+              value: "5432"
+            - name: DB_POSTGRESDB_DATABASE
+              value: "n8n"
+            - name: DB_POSTGRESDB_USER
+              value: "n8n"
+            - name: DB_POSTGRESDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-db-credentials
+                  key: DB_POSTGRESDB_PASSWORD
+            - name: N8N_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-db-credentials
+                  key: N8N_ENCRYPTION_KEY
           resources:
             requests:
               memory: "256Mi"
@@ -56,7 +73,3 @@ spec:
               port: 5678
             initialDelaySeconds: 5
             periodSeconds: 5
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: n8n-data
