@@ -12,4 +12,8 @@ data:
         CREATE USER n8n WITH PASSWORD '${N8N_DB_PASSWORD}';
         CREATE DATABASE n8n OWNER n8n;
         GRANT ALL PRIVILEGES ON DATABASE n8n TO n8n;
+
+        CREATE USER chat_memory WITH PASSWORD '${CHAT_MEMORY_DB_PASSWORD}';
+        CREATE DATABASE chat_memory OWNER chat_memory;
+        GRANT ALL PRIVILEGES ON DATABASE chat_memory TO chat_memory;
     EOSQL
