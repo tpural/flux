@@ -29,7 +29,7 @@ spec:
             - name: N8N_PROTOCOL
               value: "https"
             - name: WEBHOOK_URL
-              value: "https://n8n.lan.tapslab.com/"
+              value: "https://n8n.tapslab.com/"
             - name: N8N_EDITOR_BASE_URL
               value: "https://n8n.lan.tapslab.com/"
             - name: GENERIC_TIMEZONE
