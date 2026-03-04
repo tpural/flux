@@ -49,6 +49,8 @@ spec:
                 secretKeyRef:
                   name: n8n-db-credentials
                   key: DB_POSTGRESDB_PASSWORD
+            - name: NODES_EXCLUDE
+              value: "[]"
             - name: N8N_ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
