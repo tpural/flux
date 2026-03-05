@@ -1,0 +1,35 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: headlamp
+  namespace: flux-system
+spec:
+  interval: 5m
+  url: https://kubernetes-sigs.github.io/headlamp/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: headlamp
+  namespace: flux-system
+spec:
+  interval: 5m
+  releaseName: headlamp
+  targetNamespace: headlamp
+  chart:
+    spec:
+      chart: headlamp
+      version: "0.40.0"
+      sourceRef:
+        kind: HelmRepository
+        name: headlamp
+        namespace: flux-system
+  install:
+    createNamespace: true
+  values:
+    service:
+      type: LoadBalancer
+      port: 80
+      annotations:
+        metallb.universe.tf/address-pool: homelab-pool
+        external-dns.alpha.kubernetes.io/hostname: headlamp.lan.tapslab.com

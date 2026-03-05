@@ -20,6 +20,7 @@ resources:
 - ../../apps/n8n/flux.yaml
 - ../../apps/claude-code/flux.yaml
 - ../../apps/postgres/flux.yaml
+- ../../apps/headlamp/flux.yaml
 
 components:
 - config/metallb
