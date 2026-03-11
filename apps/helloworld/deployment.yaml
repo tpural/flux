@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-deployment
+  namespace: helloworld
+  labels:
+    app: helloworld
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+        - name: helloworld
+          image: nginx:stable
+          ports:
+            - containerPort: 80
+              name: web
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 3
