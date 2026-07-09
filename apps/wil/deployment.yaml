@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wil
+  namespace: wil
+spec:
+  replicas: 1
+  # Single-use sign-in links depend on a nonce set held in the pod's memory.
+  # A rolling update would briefly run two pods that don't share it, letting a
+  # link be redeemed once per pod, so old must stop before new starts.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wil
+  template:
+    metadata:
+      labels:
+        app: wil
+    spec:
+      serviceAccountName: wil
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: wil
+          image: ghcr.io/tpural/white-iron-lake:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: BASE_URL
+              value: https://wil.tapslab.com
+            - name: ALLOWED_EMAILS_FILE
+              value: /etc/wil/allowed_emails
+            - name: SMTP_HOST
+              value: smtp.gmail.com
+            - name: SMTP_PORT
+              value: "587"
+            - name: SMTP_USER
+              value: tapuralewski@gmail.com
+            - name: SMTP_FROM
+              value: tapuralewski@gmail.com
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wil-auth-secret
+                  key: SECRET_KEY
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wil-auth-secret
+                  key: SMTP_PASSWORD
+          volumeMounts:
+            # Mounted as a directory, not a subPath: subPath mounts never
+            # receive ConfigMap updates, which would break live revocation.
+            - name: allowed-emails
+              mountPath: /etc/wil
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 25m
+              memory: 96Mi
+            limits:
+              memory: 256Mi
+      volumes:
+        - name: allowed-emails
+          configMap:
+            name: wil-allowed-emails
