@@ -4,12 +4,10 @@ metadata:
   name: wil
   namespace: wil
 spec:
+  # The login rate limiter counts failures per client IP in the pod's memory.
+  # Extra replicas would each keep their own count, multiplying how many guesses
+  # an attacker gets, so scale this out only if that state moves somewhere shared.
   replicas: 1
-  # Single-use sign-in links depend on a nonce set held in the pod's memory.
-  # A rolling update would briefly run two pods that don't share it, letting a
-  # link be redeemed once per pod, so old must stop before new starts.
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: wil
@@ -33,40 +31,16 @@ spec:
             capabilities:
               drop: ["ALL"]
           env:
-            - name: BASE_URL
-              value: https://wil.tapslab.com
-            - name: ALLOWED_EMAILS_FILE
-              value: /etc/wil/allowed_emails
-            - name: SMTP_HOST
-              value: smtp.gmail.com
-            - name: SMTP_PORT
-              value: "587"
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: wil-auth-secret
                   key: SECRET_KEY
-            - name: SMTP_PASSWORD
+            - name: SITE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: wil-auth-secret
-                  key: SMTP_PASSWORD
-            - name: SMTP_USER
-              valueFrom:
-                secretKeyRef:
-                  name: wil-auth-secret
-                  key: SMTP_USER
-            - name: SMTP_FROM
-              valueFrom:
-                secretKeyRef:
-                  name: wil-auth-secret
-                  key: SMTP_FROM
-          volumeMounts:
-            # Mounted as a directory, not a subPath: subPath mounts never
-            # receive updates, which would break live revocation.
-            - name: allowed-emails
-              mountPath: /etc/wil
-              readOnly: true
+                  key: SITE_PASSWORD
           livenessProbe:
             httpGet:
               path: /healthz
@@ -85,13 +59,3 @@ spec:
               memory: 96Mi
             limits:
               memory: 256Mi
-      volumes:
-        # Only the allowlist is projected. Without `items` the whole Secret
-        # would land in /etc/wil, exposing SECRET_KEY and the SMTP password as
-        # files. Projecting a subset still tracks updates; only subPath doesn't.
-        - name: allowed-emails
-          secret:
-            secretName: wil-auth-secret
-            items:
-              - key: allowed_emails
-                path: allowed_emails
