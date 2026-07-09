@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wil
+  namespace: wil
+spec:
+  # The login rate limiter counts failures per client IP in the pod's memory.
+  # Extra replicas would each keep their own count, multiplying how many guesses
+  # an attacker gets, so scale this out only if that state moves somewhere shared.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wil
+  template:
+    metadata:
+      labels:
+        app: wil
+    spec:
+      serviceAccountName: wil
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: wil
+          image: ghcr.io/tpural/white-iron-lake:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wil-auth-secret
+                  key: SECRET_KEY
+            - name: SITE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wil-auth-secret
+                  key: SITE_PASSWORD
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 25m
+              memory: 96Mi
+            limits:
+              memory: 256Mi
