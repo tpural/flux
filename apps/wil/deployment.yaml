@@ -19,6 +19,11 @@ spec:
       serviceAccountName: wil
       securityContext:
         runAsNonRoot: true
+        # The image's USER is the name "wil". Kubelet cannot resolve a name to a
+        # UID before starting the container, so with runAsNonRoot alone it refuses
+        # to start rather than risk running as root. State the UID the Dockerfile
+        # creates so the check can pass.
+        runAsUser: 10001
       containers:
         - name: wil
           image: ghcr.io/tpural/white-iron-lake:1.0.3
