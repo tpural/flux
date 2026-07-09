@@ -41,10 +41,6 @@ spec:
               value: smtp.gmail.com
             - name: SMTP_PORT
               value: "587"
-            - name: SMTP_USER
-              value: tapuralewski@gmail.com
-            - name: SMTP_FROM
-              value: tapuralewski@gmail.com
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
@@ -55,9 +51,19 @@ spec:
                 secretKeyRef:
                   name: wil-auth-secret
                   key: SMTP_PASSWORD
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: wil-auth-secret
+                  key: SMTP_USER
+            - name: SMTP_FROM
+              valueFrom:
+                secretKeyRef:
+                  name: wil-auth-secret
+                  key: SMTP_FROM
           volumeMounts:
             # Mounted as a directory, not a subPath: subPath mounts never
-            # receive ConfigMap updates, which would break live revocation.
+            # receive updates, which would break live revocation.
             - name: allowed-emails
               mountPath: /etc/wil
               readOnly: true
@@ -80,6 +86,12 @@ spec:
             limits:
               memory: 256Mi
       volumes:
+        # Only the allowlist is projected. Without `items` the whole Secret
+        # would land in /etc/wil, exposing SECRET_KEY and the SMTP password as
+        # files. Projecting a subset still tracks updates; only subPath doesn't.
         - name: allowed-emails
-          configMap:
-            name: wil-allowed-emails
+          secret:
+            secretName: wil-auth-secret
+            items:
+              - key: allowed_emails
+                path: allowed_emails

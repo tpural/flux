@@ -4,7 +4,6 @@ resources:
   - namespace.yaml
   - ghcr-secret.yaml
   - serviceaccount.yaml
-  - configmap.yaml
   - auth-secret.yaml
   - deployment.yaml
   - service.yaml
