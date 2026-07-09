@@ -21,6 +21,7 @@ resources:
 - ../../apps/claude-code/flux.yaml
 - ../../apps/postgres/flux.yaml
 - ../../apps/headlamp/flux.yaml
+- ../../apps/wil/flux.yaml
 
 components:
 - config/metallb
