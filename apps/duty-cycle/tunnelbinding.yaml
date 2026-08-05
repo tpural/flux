@@ -1,0 +1,15 @@
+apiVersion: networking.cfargotunnel.com/v1alpha1
+kind: TunnelBinding
+metadata:
+  name: duty-cycle-binding
+  namespace: duty-cycle
+tunnelRef:
+  kind: Tunnel
+  name: duty-cycle-tunnel
+subjects:
+  - kind: Service
+    name: duty-cycle
+    spec:
+      fqdn: dutycycle.tapslab.com
+      path: /
+      protocol: http
