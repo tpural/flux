@@ -22,6 +22,7 @@ resources:
 - ../../apps/postgres/flux.yaml
 - ../../apps/headlamp/flux.yaml
 - ../../apps/wil/flux.yaml
+- ../../apps/duty-cycle/flux.yaml
 
 components:
 - config/metallb

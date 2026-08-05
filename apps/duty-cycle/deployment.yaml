@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: duty-cycle
+  namespace: duty-cycle
+spec:
+  # Two, unlike WIL. This serves a static bundle and holds no per-client state
+  # at all — the game is entirely client-side and telemetry is fire-and-forget —
+  # so a second replica is free rolling-update headroom rather than a
+  # correctness problem.
+  replicas: 2
+  selector:
+    matchLabels:
+      app: duty-cycle
+  template:
+    metadata:
+      labels:
+        app: duty-cycle
+    spec:
+      serviceAccountName: duty-cycle
+      securityContext:
+        runAsNonRoot: true
+        # nginx-unprivileged's USER is 101. Stated explicitly because kubelet
+        # cannot resolve an image's user NAME to a UID before start, and with
+        # runAsNonRoot alone it refuses to start rather than risk root.
+        runAsUser: 101
+      containers:
+        - name: duty-cycle
+          image: ghcr.io/tpural/duty-cycle:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
