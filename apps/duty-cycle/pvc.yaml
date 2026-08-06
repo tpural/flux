@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: duty-cycle-runs
+  namespace: duty-cycle
+spec:
+  accessModes:
+    # ReadWriteMany matches the cluster's nfs-client-retain class. The ingest is
+    # a single writer today, but RWX means a future reader pod (or a rollout
+    # overlapping two ingest pods) does not deadlock on the volume.
+    - ReadWriteMany
+  resources:
+    requests:
+      # A run record is a few KB. 1Gi is six figures of runs, and the class is
+      # Retain — deleting the claim will not delete the playtest data.
+      storage: 1Gi
+  storageClassName: nfs-client-retain

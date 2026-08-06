@@ -26,7 +26,7 @@ spec:
         runAsUser: 101
       containers:
         - name: duty-cycle
-          image: ghcr.io/tpural/duty-cycle:0.4.0
+          image: ghcr.io/tpural/duty-cycle:0.5.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -47,9 +47,20 @@ spec:
               port: 8080
             initialDelaySeconds: 3
             periodSeconds: 10
+          volumeMounts:
+            # subPath so only config.js is replaced — mounting the directory
+            # would hide index.html and the hashed assets beside it.
+            - name: config
+              mountPath: /usr/share/nginx/html/config.js
+              subPath: config.js
+              readOnly: true
           resources:
             requests:
               cpu: 10m
               memory: 32Mi
             limits:
               memory: 128Mi
+      volumes:
+        - name: config
+          configMap:
+            name: duty-cycle-config
