@@ -28,7 +28,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: ingest
-          image: ghcr.io/tpural/duty-cycle-ingest:0.5.1
+          image: ghcr.io/tpural/duty-cycle-ingest:0.6.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
