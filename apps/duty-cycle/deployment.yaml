@@ -26,13 +26,18 @@ spec:
         runAsUser: 101
       containers:
         - name: duty-cycle
-          image: ghcr.io/tpural/duty-cycle:0.5.1
+          image: ghcr.io/tpural/duty-cycle:0.6.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
               name: http
           securityContext:
             allowPrivilegeEscalation: false
+            # Matches the ingest and the tunnel, which already had it. nginx
+            # needs exactly two writable paths: its proxy/client temp area, and
+            # /tmp where the unprivileged image keeps its pid file. Both are
+            # emptyDir — nothing here is worth persisting across a restart.
+            readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
           livenessProbe:
@@ -54,6 +59,10 @@ spec:
               mountPath: /usr/share/nginx/html/config.js
               subPath: config.js
               readOnly: true
+            - name: cache
+              mountPath: /var/cache/nginx
+            - name: tmp
+              mountPath: /tmp
           resources:
             requests:
               cpu: 10m
@@ -64,3 +73,7 @@ spec:
         - name: config
           configMap:
             name: duty-cycle-config
+        - name: cache
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
