@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: duty-cycle-ingest
+  namespace: duty-cycle
+spec:
+  # ONE. The writer appends to a single file with an open stream; a second
+  # replica would interleave partial lines into the same file and corrupt
+  # records that are already written.
+  replicas: 1
+  strategy:
+    # Never two writers at once, not even for the seconds of a rollout.
+    type: Recreate
+  selector:
+    matchLabels:
+      app: duty-cycle-ingest
+  template:
+    metadata:
+      labels:
+        app: duty-cycle-ingest
+    spec:
+      serviceAccountName: duty-cycle
+      securityContext:
+        runAsNonRoot: true
+        # `node` in the official image. Stated as a number because kubelet
+        # cannot resolve a name to a UID before the container starts.
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: ingest
+          image: ghcr.io/tpural/duty-cycle-ingest:0.5.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: DATA_DIR
+              value: /data
+          volumeMounts:
+            - name: runs
+              mountPath: /data
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 10m
+              memory: 48Mi
+            limits:
+              memory: 160Mi
+      volumes:
+        - name: runs
+          persistentVolumeClaim:
+            claimName: duty-cycle-runs

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: duty-cycle-config
+  namespace: duty-cycle
+data:
+  # Mounted over /usr/share/nginx/html/config.js. This is the indirection the
+  # file was built for: the image stays immutable and the endpoint is declared
+  # here. A RELATIVE url keeps it same-origin whatever hostname serves the page.
+  #
+  # NOTE: mounted with subPath, so a change here needs a pod restart to take
+  # effect — subPath mounts do not receive ConfigMap updates.
+  config.js: |
+    window.__RR_CONFIG__ = {
+      telemetryUrl: "/runs",
+    };

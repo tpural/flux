@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: duty-cycle-ingest
+  namespace: duty-cycle
+spec:
+  # ClusterIP only. The browser reaches this through the site's own nginx at
+  # /runs, so it is same-origin — no CORS, and nothing to expose on the tunnel.
+  selector:
+    app: duty-cycle-ingest
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
