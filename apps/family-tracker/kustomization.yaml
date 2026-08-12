@@ -6,8 +6,10 @@ resources:
   - serviceaccount.yaml
   - db-secret.yaml
   - app-secret.yaml
+  - notify-secret.yaml
   - postgres.yaml
   - backup-cronjob.yaml
+  - cronjobs.yaml
   - deployment.yaml
   - service.yaml
   - cloudflare-secret.yaml
