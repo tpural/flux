@@ -23,7 +23,6 @@ resources:
 - ../../apps/headlamp/flux.yaml
 - ../../apps/wil/flux.yaml
 - ../../apps/duty-cycle/flux.yaml
-- ../../apps/giraffe/flux.yaml
 
 components:
 - config/metallb
