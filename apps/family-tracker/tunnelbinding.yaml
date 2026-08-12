@@ -1,0 +1,15 @@
+apiVersion: networking.cfargotunnel.com/v1alpha1
+kind: TunnelBinding
+metadata:
+  name: family-tracker-binding
+  namespace: family-tracker
+tunnelRef:
+  kind: Tunnel
+  name: family-tracker-tunnel
+subjects:
+  - kind: Service
+    name: family-tracker
+    spec:
+      fqdn: family.tapslab.com
+      path: /
+      protocol: http
