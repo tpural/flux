@@ -25,7 +25,7 @@ spec:
         runAsUser: 10001
       containers:
         - name: family-tracker
-          image: ghcr.io/tpural/family-tracker:0.2.1
+          image: ghcr.io/tpural/family-tracker:0.4.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -76,6 +76,13 @@ spec:
                 secretKeyRef:
                   name: family-tracker-app
                   key: CRON_SECRET
+          envFrom:
+            # VAPID keypair plus the Resend credentials. Kept separate from the
+            # app secret because it was generated wholesale, and because
+            # RESEND_API_KEY is expected to be filled in later without having to
+            # touch anything else.
+            - secretRef:
+                name: family-tracker-notify
           # Migrations run at startup, and liveness is suspended until this
           # first succeeds. Without it a migration slower than the liveness
           # delay gets the pod killed and restarted, which then starts the

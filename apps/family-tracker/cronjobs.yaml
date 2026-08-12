@@ -1,0 +1,176 @@
+# Scheduled work runs as CronJobs calling the app over the cluster Service,
+# rather than as timers inside the app process. Restarts and rollouts cannot
+# then silently skip a run, and any job can be triggered by hand with a single
+# `kubectl create job --from=`.
+#
+# Times are UTC: the CronJob spec's timeZone field is not available on this
+# cluster's Kubernetes version (1.28 has it behind a feature gate). Chicago is
+# UTC-5 in summer and UTC-6 in winter, so these drift by an hour across DST --
+# acceptable for a household digest, and the alternative is a timezone field
+# that silently does nothing.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: family-tracker-materialise
+  namespace: family-tracker
+spec:
+  schedule: "0 * * * *" # hourly
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: call
+              image: curlimages/curl:8.11.1
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: family-tracker-app
+                      key: CRON_SECRET
+              command:
+                - sh
+                - -c
+                # --fail turns a 500 into a non-zero exit, so a broken job shows
+                # up as a failed Job rather than a silent success.
+                - >-
+                  curl -sS --fail --max-time 120 -X POST
+                  -H "Authorization: Bearer $CRON_SECRET"
+                  http://family-tracker/api/jobs/materialise
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: family-tracker-digest
+  namespace: family-tracker
+spec:
+  schedule: "0 12 * * *" # 07:00 America/Chicago (CDT)
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: call
+              image: curlimages/curl:8.11.1
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: family-tracker-app
+                      key: CRON_SECRET
+              command:
+                - sh
+                - -c
+                - >-
+                  curl -sS --fail --max-time 300 -X POST
+                  -H "Authorization: Bearer $CRON_SECRET"
+                  http://family-tracker/api/jobs/digest
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: family-tracker-overdue
+  namespace: family-tracker
+spec:
+  schedule: "0 23 * * *" # 18:00 America/Chicago (CDT), after the day is done
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: call
+              image: curlimages/curl:8.11.1
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: family-tracker-app
+                      key: CRON_SECRET
+              command:
+                - sh
+                - -c
+                - >-
+                  curl -sS --fail --max-time 300 -X POST
+                  -H "Authorization: Bearer $CRON_SECRET"
+                  http://family-tracker/api/jobs/overdue
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: family-tracker-weekly
+  namespace: family-tracker
+spec:
+  schedule: "0 13 * * 0" # 08:00 Sunday America/Chicago (CDT)
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: call
+              image: curlimages/curl:8.11.1
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: family-tracker-app
+                      key: CRON_SECRET
+              command:
+                - sh
+                - -c
+                - >-
+                  curl -sS --fail --max-time 300 -X POST
+                  -H "Authorization: Bearer $CRON_SECRET"
+                  http://family-tracker/api/jobs/weekly
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: family-tracker-calendar-sync
+  namespace: family-tracker
+spec:
+  schedule: "*/10 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: call
+              image: curlimages/curl:8.11.1
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: family-tracker-app
+                      key: CRON_SECRET
+              command:
+                - sh
+                - -c
+                - >-
+                  curl -sS --fail --max-time 240 -X POST
+                  -H "Authorization: Bearer $CRON_SECRET"
+                  http://family-tracker/api/jobs/calendar-sync
