@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: family-tracker-db
+  namespace: family-tracker
+spec:
+  replicas: 1
+  # A second pod must never attach to the same data directory, so the old one
+  # is torn down before the new one starts rather than overlapping.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: family-tracker-db
+  template:
+    metadata:
+      labels:
+        app: family-tracker-db
+    spec:
+      # hostPath, so the data lives on one specific node and the pod has to
+      # follow it. mm01 rather than gpu01: the shared apps/postgres instance has
+      # been Pending for weeks because its node went NotReady, and there is no
+      # reason to repeat that. The nightly pg_dump CronJob is the answer to
+      # "what if mm01 dies", since the dump lands on NFS instead.
+      nodeSelector:
+        kubernetes.io/hostname: mm01
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_USER
+              value: family
+            - name: POSTGRES_DB
+              value: family_tracker
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: family-tracker-db
+                  key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "family", "-d", "family_tracker"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "family", "-d", "family_tracker"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+      volumes:
+        - name: data
+          hostPath:
+            path: /opt/family-tracker/postgres
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: family-tracker-db
+  namespace: family-tracker
+spec:
+  selector:
+    app: family-tracker-db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432

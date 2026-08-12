@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: family-tracker
+  namespace: family-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: family-tracker
+  template:
+    metadata:
+      labels:
+        app: family-tracker
+    spec:
+      serviceAccountName: family-tracker
+      # amd64 only: this app sits next to its own Postgres on an amd64 worker,
+      # and the image is not built for the Pi nodes.
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      securityContext:
+        runAsNonRoot: true
+        # The image's USER is numeric already, but kubelet checks this before it
+        # ever reads the image config, so state it here too.
+        runAsUser: 10001
+      containers:
+        - name: family-tracker
+          image: ghcr.io/tpural/family-tracker:0.2.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          env:
+            # Applied by instrumentation.ts before the server accepts traffic,
+            # so a bad migration fails the rollout instead of the requests.
+            - name: RUN_MIGRATIONS
+              value: "true"
+            - name: AUTH_URL
+              value: https://family.tapslab.com
+            # Behind the Cloudflare tunnel the app sees an internal origin, so
+            # Auth.js has to be told to believe the forwarded host headers or
+            # every OAuth callback redirects to the wrong place.
+            - name: AUTH_TRUST_HOST
+              value: "true"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: family-tracker-app
+                  key: DATABASE_URL
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: family-tracker-app
+                  key: AUTH_SECRET
+            - name: AUTH_GOOGLE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: family-tracker-app
+                  key: AUTH_GOOGLE_ID
+            - name: AUTH_GOOGLE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: family-tracker-app
+                  key: AUTH_GOOGLE_SECRET
+            - name: ALLOWED_EMAILS
+              valueFrom:
+                secretKeyRef:
+                  name: family-tracker-app
+                  key: ALLOWED_EMAILS
+            - name: CRON_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: family-tracker-app
+                  key: CRON_SECRET
+          # Migrations run at startup, and liveness is suspended until this
+          # first succeeds. Without it a migration slower than the liveness
+          # delay gets the pod killed and restarted, which then starts the
+          # migration over -- a crash loop that looks like a broken image.
+          startupProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+            periodSeconds: 5
+            failureThreshold: 60 # up to 5 minutes to migrate and boot
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 192Mi
+            limits:
+              memory: 512Mi

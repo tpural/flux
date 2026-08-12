@@ -1,0 +1,61 @@
+# The database sits on mm01's local disk, so losing that node loses the data.
+# This puts a nightly dump on NFS, which every node can reach.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: family-tracker-backups
+  namespace: family-tracker
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: nfs-client-retain
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: family-tracker-db-backup
+  namespace: family-tracker
+spec:
+  schedule: "15 8 * * *" # 03:15 America/Chicago
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: pg-dump
+              image: postgres:17-alpine
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: family-tracker-db
+                      key: POSTGRES_PASSWORD
+              command:
+                - /bin/sh
+                - -c
+                # Write to a temporary name and rename on success, so an
+                # interrupted dump never replaces a good backup with a truncated
+                # one. Then keep the last 14.
+                - |
+                  set -eu
+                  stamp=$(date +%Y%m%d)
+                  tmp=/backups/.family_tracker-$stamp.sql.gz.partial
+                  final=/backups/family_tracker-$stamp.sql.gz
+                  pg_dump -h family-tracker-db -U family -d family_tracker | gzip > "$tmp"
+                  mv "$tmp" "$final"
+                  ls -1t /backups/family_tracker-*.sql.gz | tail -n +15 | xargs -r rm --
+                  echo "backup complete: $final"
+              volumeMounts:
+                - name: backups
+                  mountPath: /backups
+          volumes:
+            - name: backups
+              persistentVolumeClaim:
+                claimName: family-tracker-backups
