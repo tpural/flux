@@ -24,6 +24,7 @@ resources:
 - ../../apps/wil/flux.yaml
 - ../../apps/duty-cycle/flux.yaml
 - ../../apps/family-tracker/flux.yaml
+- ../../apps/template/flux.yaml
 
 components:
 - config/metallb
