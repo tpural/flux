@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: template
+  namespace: template
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: template
+  template:
+    metadata:
+      labels:
+        app: template
+    spec:
+      serviceAccountName: template
+      # The image is built for amd64 only, so keep it off the Pi nodes.
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      securityContext:
+        runAsNonRoot: true
+        # The image's USER is numeric already, but kubelet checks this before
+        # it ever reads the image config, so state it here too.
+        runAsUser: 10001
+      containers:
+        - name: template
+          image: ghcr.io/tpural/tapslab-template:demo-0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: NODE_ENV
+              value: production
+          # Liveness is suspended until the startup probe first succeeds. Without
+          # it, a boot slower than the liveness delay gets the pod killed and
+          # restarted -- a crash loop that looks like a broken image.
+          startupProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+            periodSeconds: 5
+            failureThreshold: 60 # up to 5 minutes to boot
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
