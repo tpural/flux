@@ -1,0 +1,15 @@
+apiVersion: networking.cfargotunnel.com/v1alpha1
+kind: TunnelBinding
+metadata:
+  name: template-binding
+  namespace: template
+tunnelRef:
+  kind: Tunnel
+  name: template-tunnel
+subjects:
+  - kind: Service
+    name: template
+    spec:
+      fqdn: template.tapslab.com
+      path: /
+      protocol: http
