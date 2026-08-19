@@ -17,14 +17,19 @@ spec:
       # The image is built for amd64 only, so keep it off the Pi nodes.
       nodeSelector:
         kubernetes.io/arch: amd64
+      # Nothing here talks to the Kubernetes API, so it should not carry a
+      # token that can.
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
         # The image's USER is numeric already, but kubelet checks this before
         # it ever reads the image config, so state it here too.
         runAsUser: 10001
       containers:
         - name: template
-          image: ghcr.io/tpural/tapslab-template:demo-0.2.0
+          image: ghcr.io/tpural/tapslab-template:demo-0.3.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -55,9 +60,13 @@ spec:
               path: /api/healthz
               port: 8080
             periodSeconds: 20
+          # Readiness alone points at /api/readyz. A dependency failing there
+          # takes the pod out of the Service until it recovers; the same check
+          # behind liveness would restart the pod instead, which cannot fix a
+          # database.
           readinessProbe:
             httpGet:
-              path: /api/healthz
+              path: /api/readyz
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
