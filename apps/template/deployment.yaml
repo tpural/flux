@@ -24,7 +24,7 @@ spec:
         runAsUser: 10001
       containers:
         - name: template
-          image: ghcr.io/tpural/tapslab-template:demo-0.1.0
+          image: ghcr.io/tpural/tapslab-template:demo-0.2.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -36,6 +36,11 @@ spec:
           env:
             - name: NODE_ENV
               value: production
+            # This instance is public and authenticates nobody, so every write
+            # path is closed. Without it anyone could post text that is then
+            # served from tapslab.com until the pod happens to restart.
+            - name: DEMO_READONLY
+              value: "true"
           # Liveness is suspended until the startup probe first succeeds. Without
           # it, a boot slower than the liveness delay gets the pod killed and
           # restarted -- a crash loop that looks like a broken image.
