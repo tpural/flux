@@ -17,14 +17,9 @@ resources:
 - ../../apps/home-assistant/flux.yaml
 - ../../apps/gpu-operator/flux.yaml
 - ../../apps/ollama/flux.yaml
-- ../../apps/n8n/flux.yaml
 - ../../apps/claude-code/flux.yaml
 - ../../apps/postgres/flux.yaml
 - ../../apps/headlamp/flux.yaml
-- ../../apps/wil/flux.yaml
-- ../../apps/duty-cycle/flux.yaml
-- ../../apps/family-tracker/flux.yaml
-- ../../apps/template/flux.yaml
 
 components:
 - config/metallb
