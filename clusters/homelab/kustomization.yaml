@@ -13,11 +13,9 @@ resources:
 - ../../apps/openwebui/flux.yaml
 - ../../apps/cloudflare-operator/flux.yaml
 - ../../apps/angelorooms/flux.yaml
-- ../../apps/nanostatus/flux.yaml
 - ../../apps/home-assistant/flux.yaml
 - ../../apps/gpu-operator/flux.yaml
 - ../../apps/llama-swap/flux.yaml
-- ../../apps/claude-code/flux.yaml
 - ../../apps/postgres/flux.yaml
 - ../../apps/headlamp/flux.yaml
 
