@@ -51,6 +51,7 @@ spec:
   timeout: 5m
   values:
     pilot:
+      autoscaleMin: 2
       env:
         PILOT_ENABLE_GATEWAY_API: true
         PILOT_ENABLE_GATEWAY_API_STATUS: true
