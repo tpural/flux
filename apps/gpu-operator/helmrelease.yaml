@@ -17,7 +17,8 @@ spec:
     operator:
       defaultRuntime: containerd
     driver:
-      enabled: true
+      # Host driver: Canonical-signed linux-modules-nvidia-595-server-open (Secure Boot on gpu01)
+      enabled: false
     toolkit:
       enabled: true
     devicePlugin:
