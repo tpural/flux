@@ -16,7 +16,6 @@ resources:
 - ../../apps/nanostatus/flux.yaml
 - ../../apps/home-assistant/flux.yaml
 - ../../apps/gpu-operator/flux.yaml
-- ../../apps/ollama/flux.yaml
 - ../../apps/claude-code/flux.yaml
 - ../../apps/postgres/flux.yaml
 - ../../apps/headlamp/flux.yaml
