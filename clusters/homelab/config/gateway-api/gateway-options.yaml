@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: default-gateway-options
+  namespace: istio-system
+data:
+  deployment: |
+    spec:
+      template:
+        spec:
+          nodeSelector:
+            kubernetes.io/arch: amd64

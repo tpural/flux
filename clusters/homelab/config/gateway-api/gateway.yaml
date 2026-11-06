@@ -14,6 +14,11 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-dns01-staging
 spec:
   gatewayClassName: istio
+  infrastructure:
+    parametersRef:
+      group: ""
+      kind: ConfigMap
+      name: default-gateway-options
   listeners:
   - name: http
     port: 80
