@@ -16,7 +16,7 @@ spec:
       serviceAccountName: nanostatus
       containers:
         - name: nanostatus
-          image: gjames8/nanostatus:latest
+          image: gjames8/nanostatus:v1.2.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
