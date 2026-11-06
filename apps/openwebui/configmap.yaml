@@ -5,6 +5,7 @@ metadata:
   namespace: openwebui
 data:
   .env: |
+    ENABLE_PERSISTENT_CONFIG=False
     ENABLE_OLLAMA_API=false
     OPENAI_API_BASE_URL=http://llama-swap.llama-swap.svc.cluster.local:8080/v1
     OPENAI_API_KEY=none
