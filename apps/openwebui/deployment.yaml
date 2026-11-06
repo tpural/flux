@@ -20,17 +20,19 @@ spec:
         - containerPort: 8080
           name: http
         env:
-        - name: OLLAMA_BASE_URL
-          value: "http://ollama.ollama.svc.cluster.local:11434"
+        - name: ENABLE_PERSISTENT_CONFIG
+          value: "False"
+        - name: ENABLE_OLLAMA_API
+          value: "false"
         - name: WEBUI_SECRET_KEY
           valueFrom:
             secretKeyRef:
               name: openwebui-secret
               key: WEBUI_SECRET_KEY
         - name: OPENAI_API_BASE_URL
-          value: "http://ollama.ollama.svc.cluster.local:11434/v1"
+          value: "http://llama-swap.llama-swap.svc.cluster.local:8080/v1"
         - name: OPENAI_API_KEY
-          value: "ollama"
+          value: "none"
         - name: WEBUI_JWT_SECRET_KEY
           valueFrom:
             secretKeyRef:
@@ -55,9 +57,9 @@ spec:
         - name: ENABLE_OPENAI_API
           value: "true"
         - name: ENABLE_OPENAI_API_BASE_URL
-          value: "http://ollama.ollama.svc.cluster.local:11434/v1"
+          value: "http://llama-swap.llama-swap.svc.cluster.local:8080/v1"
         - name: ENABLE_OPENAI_API_KEY
-          value: "ollama"
+          value: "none"
         - name: ENABLE_LOCAL_MODEL_DOWNLOAD
           value: "false"
         - name: ENABLE_LOCAL_MODEL_UPLOAD
