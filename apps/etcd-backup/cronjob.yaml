@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etcd-backup
+  namespace: kube-system
+spec:
+  schedule: "17 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          hostNetwork: true
+          nodeSelector:
+            node-role.kubernetes.io/control-plane: ""
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
+          initContainers:
+            - name: snapshot
+              image: registry.k8s.io/etcd:3.6.8-0
+              command:
+                - etcdctl
+                - --endpoints=https://127.0.0.1:2379
+                - --cacert=/pki/ca.crt
+                - --cert=/pki/healthcheck-client.crt
+                - --key=/pki/healthcheck-client.key
+                - snapshot
+                - save
+                - /backup/.incoming.db
+              volumeMounts:
+                - name: pki
+                  mountPath: /pki
+                  readOnly: true
+                - name: backup
+                  mountPath: /backup
+          containers:
+            - name: rotate
+              image: busybox:1.36
+              command:
+                - sh
+                - -c
+                - |
+                  set -e
+                  size=$(stat -c %s /backup/.incoming.db)
+                  [ "$size" -gt 1000000 ] || { echo "snapshot too small: $size"; exit 1; }
+                  name=etcd-$(date +%Y-%m-%d).db
+                  mv /backup/.incoming.db /backup/$name
+                  find /backup -name 'etcd-*.db' -mtime +14 -delete
+                  echo "saved $name ($size bytes)"; ls -la /backup
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+          volumes:
+            - name: pki
+              hostPath:
+                path: /etc/kubernetes/pki/etcd
+                type: Directory
+            - name: backup
+              persistentVolumeClaim:
+                claimName: etcd-backups
