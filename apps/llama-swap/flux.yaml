@@ -1,0 +1,16 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: llama-swap
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: gpu-operator
+  interval: 10m0s
+  path: ./apps/llama-swap
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  timeout: 10m
