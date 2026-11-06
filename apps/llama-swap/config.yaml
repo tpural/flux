@@ -1,0 +1,28 @@
+healthCheckTimeout: 900
+
+macros:
+  server: >-
+    llama-server --port ${PORT} --host 127.0.0.1
+    --n-gpu-layers 999 --flash-attn on --jinja
+    --ctx-size 65536 --cache-type-k q8_0 --cache-type-v q8_0
+    --temp 0.7 --top-p 0.8 --top-k 20 --min-p 0.0
+
+models:
+  qwen3-next-80b:
+    name: "Qwen3-Next 80B (general)"
+    aliases: [qwen3-next, general]
+    cmd: >-
+      ${server}
+      --model /models/Qwen3-Next-80B-A3B-Instruct-UD-Q3_K_XL.gguf
+      --n-cpu-moe 24
+    ttl: 3600
+
+  qwen3-coder-next:
+    name: "Qwen3-Coder-Next (coding)"
+    aliases: [coder, coding]
+    cmd: >-
+      ${server}
+      --model /models/Qwen3-Coder-Next-UD-Q3_K_M.gguf
+      --n-cpu-moe 24
+      --repeat-penalty 1.05
+    ttl: 3600
