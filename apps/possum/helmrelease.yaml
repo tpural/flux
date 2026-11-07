@@ -52,7 +52,7 @@ spec:
           maxSize: 1
           dryRun: false
           suspend: true
-          scaleDownUnneededTime: 1m
+          scaleDownUnneededTime: 15m
           timeouts:
             boot: 3m
             powerSettle: 1m
