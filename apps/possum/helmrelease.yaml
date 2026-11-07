@@ -20,14 +20,14 @@ spec:
   chart:
     spec:
       chart: possum
-      version: "0.1.0"
+      version: "0.1.1"
       sourceRef:
         kind: HelmRepository
         name: possum
         namespace: flux-system
   values:
     config:
-      dryRun: true
+      dryRun: false
       nodeGroups:
         - name: pi-workers
           minSize: 1
