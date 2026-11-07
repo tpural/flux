@@ -4,7 +4,6 @@ metadata:
   name: llama-swap
   namespace: llama-swap
 spec:
-  replicas: 1
   strategy:
     type: Recreate
   selector:

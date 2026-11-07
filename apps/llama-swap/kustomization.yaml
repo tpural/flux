@@ -5,6 +5,7 @@ resources:
   - namespace.yaml
   - deployment.yaml
   - service.yaml
+  - gate.yaml
 configMapGenerator:
   - name: llama-swap-config
     files:

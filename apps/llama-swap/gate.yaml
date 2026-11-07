@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: llama-swap-gate
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: llama-swap-gate
+rules:
+  - apiGroups: [apps]
+    resources: [deployments]
+    resourceNames: [llama-swap]
+    verbs: [get, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: llama-swap-gate
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: llama-swap-gate
+subjects:
+  - kind: ServiceAccount
+    name: llama-swap-gate
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama-swap-gate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llama-swap-gate
+  template:
+    metadata:
+      labels:
+        app: llama-swap-gate
+    spec:
+      serviceAccountName: llama-swap-gate
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: gate
+          image: ghcr.io/tpural/possum:0.3.0
+          args:
+            - gate
+            - --upstream=http://llama-swap-backend.llama-swap.svc:8080
+            - --deployment=llama-swap/llama-swap
+            - --models-config=/config/config.yaml
+            - --idle=45m
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 9090
+              name: admin
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: admin
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: admin
+          resources:
+            requests: {cpu: 10m, memory: 32Mi}
+            limits: {memory: 128Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: llama-swap-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llama-swap-backend
+spec:
+  ports:
+    - port: 8080
+      targetPort: http
+      name: http
+  selector:
+    app: llama-swap
