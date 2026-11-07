@@ -17,6 +17,11 @@ spec:
   interval: 10m
   releaseName: possum
   targetNamespace: possum
+  # A suspended gpu01 keeps its Node, so its agent pod is never ready while it sleeps.
+  install:
+    disableWait: true
+  upgrade:
+    disableWait: true
   chart:
     spec:
       chart: possum
