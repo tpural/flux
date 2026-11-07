@@ -15,6 +15,10 @@ spec:
       labels:
         app: llama-swap
     spec:
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
       containers:
         - name: llama-swap
           image: ghcr.io/mostlygeek/llama-swap:v264-cuda-b11580
