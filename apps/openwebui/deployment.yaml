@@ -33,6 +33,8 @@ spec:
           value: "http://llama-swap.llama-swap.svc.cluster.local:8080/v1"
         - name: OPENAI_API_KEY
           value: "none"
+        - name: AIOHTTP_CLIENT_TIMEOUT
+          value: "900"
         - name: WEBUI_JWT_SECRET_KEY
           valueFrom:
             secretKeyRef:
