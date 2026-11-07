@@ -32,7 +32,7 @@ spec:
               name: openwebui-secret
               key: WEBUI_SECRET_KEY
         - name: OPENAI_API_BASE_URL
-          value: "http://llama-swap.llama-swap.svc.cluster.local:8080/v1"
+          value: "http://gridtie.gridtie.svc.cluster.local:8080/v1"
         - name: OPENAI_API_KEY
           value: "none"
         - name: AIOHTTP_CLIENT_TIMEOUT
@@ -61,7 +61,7 @@ spec:
         - name: ENABLE_OPENAI_API
           value: "true"
         - name: ENABLE_OPENAI_API_BASE_URL
-          value: "http://llama-swap.llama-swap.svc.cluster.local:8080/v1"
+          value: "http://gridtie.gridtie.svc.cluster.local:8080/v1"
         - name: ENABLE_OPENAI_API_KEY
           value: "none"
         - name: ENABLE_LOCAL_MODEL_DOWNLOAD

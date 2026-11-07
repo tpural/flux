@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gridtie
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gridtie
+  template:
+    metadata:
+      labels:
+        app: gridtie
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: gridtie
+          image: ghcr.io/tpural/gridtie:0.2.0-rc.1.1
+          envFrom:
+            - secretRef:
+                name: gridtie-openrouter
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 9090
+              name: admin
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: admin
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: admin
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/gridtie
+      volumes:
+        - name: config
+          configMap:
+            name: gridtie-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gridtie
+spec:
+  ports:
+    - port: 8080
+      targetPort: http
+      name: http
+    - port: 9090
+      targetPort: admin
+      name: admin
+  selector:
+    app: gridtie

@@ -21,6 +21,7 @@ resources:
 - ../../apps/etcd-backup/flux.yaml
 - ../../apps/headlamp/flux.yaml
 - ../../apps/possum/flux.yaml
+- ../../apps/gridtie/flux.yaml
 
 components:
 - config/metallb

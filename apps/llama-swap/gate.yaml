@@ -98,3 +98,15 @@ spec:
       name: http
   selector:
     app: llama-swap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llama-swap-gate-admin
+spec:
+  ports:
+    - port: 9090
+      targetPort: admin
+      name: admin
+  selector:
+    app: llama-swap-gate

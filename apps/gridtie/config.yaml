@@ -1,0 +1,26 @@
+wakeOnModels: true
+providers:
+  local:
+    baseURL: http://llama-swap.llama-swap.svc:8080/v1
+    readiness:
+      llamaSwap: http://llama-swap-backend.llama-swap.svc:8080
+    wake:
+      url: http://llama-swap-gate-admin.llama-swap.svc:9090/wake?for=45m
+  openrouter:
+    baseURL: https://openrouter.ai/api/v1
+    apiKeyEnv: OPENROUTER_API_KEY
+    headers:
+      X-Title: tapslab
+models:
+  qwen3-coder-next:
+    name: Qwen3-Coder-Next (coding)
+    aliases: [coder, coding]
+    routes:
+      - {provider: local, model: qwen3-coder-next}
+      - {provider: openrouter, model: qwen/qwen3-coder-next}
+  qwen3-next-80b:
+    name: Qwen3-Next 80B (general)
+    aliases: [qwen3-next, general]
+    routes:
+      - {provider: local, model: qwen3-next-80b}
+      - {provider: openrouter, model: qwen/qwen3-next-80b-a3b-instruct}
