@@ -20,7 +20,7 @@ spec:
   chart:
     spec:
       chart: possum
-      version: "0.1.1"
+      version: "0.3.0"
       sourceRef:
         kind: HelmRepository
         name: possum
@@ -47,6 +47,34 @@ spec:
             - {name: pi-fd8e980f, target: "74:ac:b9:55:27:a0/5", mac: "dc:a6:32:da:6d:85"}
             - {name: pi-80438b1b, target: "74:ac:b9:55:27:a0/6", mac: "dc:a6:32:d9:bf:a4"}
             - {name: pi-b9483b5b, target: "74:ac:b9:55:27:a0/7", mac: "dc:a6:32:da:73:af"}
+        - name: gpu
+          minSize: 0
+          maxSize: 1
+          dryRun: true
+          scaleDownUnneededTime: 15m
+          timeouts:
+            boot: 10m
+            powerSettle: 3m
+          driver:
+            name: wol
+            config:
+              broadcast: 10.1.51.255:9
+          labels:
+            possum.dev/group: gpu
+          taints:
+            - {key: nvidia.com/gpu, value: present, effect: NoSchedule}
+          template:
+            cpu: "24"
+            memory: 31Gi
+            resources:
+              nvidia.com/gpu: "1"
+            labels:
+              kubernetes.io/arch: amd64
+              nvidia.com/gpu.product: NVIDIA-GeForce-RTX-3090
+          nodes:
+            - {name: gpu01, target: "d8:43:ae:24:7c:8a@10.1.51.10", mac: "d8:43:ae:24:7c:8a"}
+    provider:
+      hostNetwork: true
     credentials:
       existingSecret: possum-unifi
     autoscaler:
