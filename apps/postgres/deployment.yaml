@@ -16,7 +16,7 @@ spec:
         app: postgres
     spec:
       nodeSelector:
-        kubernetes.io/hostname: gpu01
+        kubernetes.io/hostname: mm01
       containers:
         - name: postgres
           image: postgres:17-alpine
