@@ -1,5 +1,9 @@
 healthCheckTimeout: 900
 
+hooks:
+  on_startup:
+    preload: [qwen3-coder-next]
+
 macros:
   server: >-
     llama-server --port ${PORT} --host 127.0.0.1
