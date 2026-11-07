@@ -48,7 +48,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: gate
-          image: ghcr.io/tpural/possum:0.4.0-rc.5.3
+          image: ghcr.io/tpural/possum:0.5.0
           args:
             - gate
             - --upstream=http://llama-swap-backend.llama-swap.svc:8080
@@ -56,6 +56,7 @@ spec:
             - --models-config=/config/config.yaml
             - --idle=45m
             - --prewarm-on-models=10m
+            - --wake-url=http://possum.possum.svc:8080/api/groups/gpu/wake
           ports:
             - containerPort: 8080
               name: http
