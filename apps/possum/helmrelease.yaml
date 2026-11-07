@@ -20,7 +20,7 @@ spec:
   chart:
     spec:
       chart: possum
-      version: "0.3.0"
+      version: "0.4.0-rc.4.2"
       sourceRef:
         kind: HelmRepository
         name: possum
@@ -50,11 +50,12 @@ spec:
         - name: gpu
           minSize: 0
           maxSize: 1
-          dryRun: true
+          dryRun: false
+          suspend: true
           scaleDownUnneededTime: 15m
           timeouts:
-            boot: 10m
-            powerSettle: 3m
+            boot: 3m
+            powerSettle: 1m
           driver:
             name: wol
             config:
