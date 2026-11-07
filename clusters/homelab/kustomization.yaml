@@ -20,6 +20,7 @@ resources:
 - ../../apps/postgres/flux.yaml
 - ../../apps/etcd-backup/flux.yaml
 - ../../apps/headlamp/flux.yaml
+- ../../apps/possum/flux.yaml
 
 components:
 - config/metallb
