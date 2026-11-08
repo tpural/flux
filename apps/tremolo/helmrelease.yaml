@@ -32,6 +32,7 @@ spec:
         namespace: flux-system
   values:
     possumURL: http://possum.possum.svc:8080
+    hostLookback: 2160h
     nodeSelector:
       kubernetes.io/arch: amd64
     httpRoute:
@@ -46,10 +47,14 @@ spec:
           sectionName: https
     metrics:
       server:
+        retentionPeriod: 90d
         nodeSelector:
           kubernetes.io/arch: amd64
     logs:
       server:
+        retentionPeriod: 30d
+        # Safety net against a log flood filling the volume before 30 days.
+        retentionDiskSpaceUsage: 15
         nodeSelector:
           kubernetes.io/arch: amd64
     kubernetes:

@@ -5,6 +5,11 @@ metadata:
   namespace: gpu-operator
 spec:
   interval: 30m
+  # A suspended gpu01 keeps its Node, so its GPU pods are never ready while it sleeps.
+  install:
+    disableWait: true
+  upgrade:
+    disableWait: true
   chart:
     spec:
       chart: gpu-operator
@@ -32,3 +37,8 @@ spec:
       enabled: false
     gfd:
       enabled: true
+    node-feature-discovery:
+      worker:
+        # Pis can't hold an NVIDIA GPU and have no DMI table: there NFD only logs DMI errors.
+        nodeSelector:
+          kubernetes.io/arch: amd64
