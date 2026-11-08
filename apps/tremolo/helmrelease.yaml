@@ -25,7 +25,7 @@ spec:
   chart:
     spec:
       chart: tremolo
-      version: "0.5.0"
+      version: "0.6.0-rc.10.15"
       sourceRef:
         kind: HelmRepository
         name: tremolo
