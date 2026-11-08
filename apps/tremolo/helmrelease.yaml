@@ -32,9 +32,19 @@ spec:
         namespace: flux-system
   values:
     alerts:
+      envFromSecret: tremolo-alerts-env
       config:
         timezone: America/Chicago
         url: https://tremolo.lan.tapslab.com
+        notify:
+          page: phone
+          warn: phone
+        channels:
+          phone:
+            type: homeassistant
+            url: http://home-assistant-lb.home-assistant.svc
+            service: mobile_app_tims_iphone
+            token: ${HA_TOKEN}
     providers:
       kubernetes:
         asleepTaints: [possum.dev/asleep]
