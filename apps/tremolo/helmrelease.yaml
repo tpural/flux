@@ -25,12 +25,16 @@ spec:
   chart:
     spec:
       chart: tremolo
-      version: "0.4.1-rc.7.12"
+      version: "0.5.0-rc.8.13"
       sourceRef:
         kind: HelmRepository
         name: tremolo
         namespace: flux-system
   values:
+    alerts:
+      config:
+        timezone: America/Chicago
+        url: https://tremolo.lan.tapslab.com
     providers:
       kubernetes:
         asleepTaints: [possum.dev/asleep]
