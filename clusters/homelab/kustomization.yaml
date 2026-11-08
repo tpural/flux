@@ -22,6 +22,7 @@ resources:
 - ../../apps/headlamp/flux.yaml
 - ../../apps/possum/flux.yaml
 - ../../apps/gridtie/flux.yaml
+- ../../apps/tremolo/flux.yaml
 
 components:
 - config/metallb

@@ -30,6 +30,20 @@ spec:
         kind: HelmRepository
         name: possum
         namespace: flux-system
+  # The chart has no pod annotations yet; let tremolo scrape the provider's metrics.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: possum
+            patch: |
+              - op: add
+                path: /spec/template/metadata/annotations/prometheus.io~1scrape
+                value: "true"
+              - op: add
+                path: /spec/template/metadata/annotations/prometheus.io~1port
+                value: "8080"
   values:
     config:
       dryRun: false

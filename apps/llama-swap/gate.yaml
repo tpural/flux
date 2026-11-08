@@ -38,6 +38,9 @@ spec:
     metadata:
       labels:
         app: llama-swap-gate
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
     spec:
       serviceAccountName: llama-swap-gate
       nodeSelector:

@@ -11,6 +11,9 @@ spec:
     metadata:
       labels:
         app: gridtie
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
