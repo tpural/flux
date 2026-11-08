@@ -4,3 +4,10 @@ resources:
   - namespace.yaml
   - secret.yaml
   - https://github.com/adyanth/cloudflare-operator/config/default?ref=v0.13.1
+patches:
+  - target:
+      kind: CustomResourceDefinition
+    patch: |
+      - op: add
+        path: /metadata/annotations/kustomize.toolkit.fluxcd.io~1prune
+        value: disabled

@@ -33,6 +33,10 @@ spec:
         - op: add
           path: /metadata/annotations/cert-manager.io~1inject-ca-from
           value: cloudflare-operator-system/cloudflare-operator-serving-cert
+        # Removing a CRD deletes every tunnel; never let a prune do that.
+        - op: add
+          path: /metadata/annotations/kustomize.toolkit.fluxcd.io~1prune
+          value: disabled
     - target:
         kind: CustomResourceDefinition
         name: clustertunnels.networking.cfargotunnel.com
