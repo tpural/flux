@@ -7,6 +7,8 @@ metadata:
     app: whisper
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: whisper
@@ -17,10 +19,11 @@ spec:
     spec:
       containers:
       - name: whisper
-        image: rhasspy/wyoming-whisper:3.3.1
+        image: rhasspy/wyoming-whisper:3.8.1
         args:
         - --model
-        - tiny-int8
+        # tiny mishears short commands; base is still fast on CPU.
+        - base-int8
         - --language
         - en
         ports:
@@ -29,6 +32,8 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
+      nodeSelector:
+        kubernetes.io/arch: amd64
       volumes:
       - name: data
         persistentVolumeClaim:

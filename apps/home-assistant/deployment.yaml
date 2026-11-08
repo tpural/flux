@@ -7,6 +7,9 @@ metadata:
     app: home-assistant
 spec:
   replicas: 1
+  # One instance at a time: two would share the SQLite database during a rollout.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: home-assistant
@@ -24,9 +27,13 @@ spec:
         env:
         - name: TZ
           value: "America/Chicago"
+        resources:
+          requests: {cpu: 200m, memory: 512Mi}
         volumeMounts:
         - name: config
           mountPath: /config
+      nodeSelector:
+        kubernetes.io/arch: amd64
       volumes:
       - name: config
         persistentVolumeClaim:

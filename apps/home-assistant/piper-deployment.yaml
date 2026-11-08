@@ -7,6 +7,8 @@ metadata:
     app: piper
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: piper
@@ -17,7 +19,7 @@ spec:
     spec:
       containers:
       - name: piper
-        image: rhasspy/wyoming-piper:2.2.2
+        image: rhasspy/wyoming-piper:2.5.2
         args:
         - --voice
         - en_US-lessac-medium
@@ -27,6 +29,8 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
+      nodeSelector:
+        kubernetes.io/arch: amd64
       volumes:
       - name: data
         persistentVolumeClaim:

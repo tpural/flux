@@ -11,4 +11,4 @@ spec:
   newTunnel:
     name: home-assistant-tunnel
   deployPatch: |
-    {"spec":{"template":{"spec":{"containers":[{"name":"cloudflared","image":"cloudflare/cloudflared:2026.6.1"}]}}}}
+    {"spec":{"template":{"spec":{"containers":[{"name":"cloudflared","image":"cloudflare/cloudflared:2026.10.7"}]}}}}
