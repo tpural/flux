@@ -20,7 +20,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: gridtie
-          image: ghcr.io/tpural/gridtie:0.2.0-rc.2.2
+          image: ghcr.io/tpural/gridtie:0.3.0-rc.4.3
           envFrom:
             - secretRef:
                 name: gridtie-openrouter
