@@ -33,6 +33,15 @@ spec:
   values:
     alerts:
       envFromSecret: tremolo-alerts-env
+      rules:
+        phone-test.star: |
+          # One-off check that notifications reach the phone; fires, then resolves on its own.
+          EVERY = "15s"
+
+          def check(now):
+              if now.unix < 1794171452:
+                  return alert("Test from tremolo: alerts reach your phone", severity = "warn")
+              return ok()
       config:
         timezone: America/Chicago
         url: https://tremolo.lan.tapslab.com
