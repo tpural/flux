@@ -25,13 +25,17 @@ spec:
   chart:
     spec:
       chart: tremolo
-      version: "0.4.0"
+      version: "0.4.1-rc.7.11"
       sourceRef:
         kind: HelmRepository
         name: tremolo
         namespace: flux-system
   values:
-    possumURL: http://possum.possum.svc:8080
+    providers:
+      kubernetes:
+        asleepTaints: [possum.dev/asleep]
+      possum:
+        enabled: true
     hostLookback: 2160h
     nodeSelector:
       kubernetes.io/arch: amd64
