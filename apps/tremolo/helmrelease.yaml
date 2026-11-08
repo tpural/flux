@@ -25,7 +25,7 @@ spec:
   chart:
     spec:
       chart: tremolo
-      version: "0.1.0"
+      version: "0.2.0-rc.3.2"
       sourceRef:
         kind: HelmRepository
         name: tremolo
@@ -53,6 +53,7 @@ spec:
         nodeSelector:
           kubernetes.io/arch: amd64
     kubernetes:
+      clusterName: homelab
       cluster:
         nodeSelector:
           kubernetes.io/arch: amd64
