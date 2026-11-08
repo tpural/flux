@@ -25,7 +25,7 @@ spec:
   chart:
     spec:
       chart: tremolo
-      version: "0.3.0-rc.5.8"
+      version: "0.4.0-rc.6.9"
       sourceRef:
         kind: HelmRepository
         name: tremolo
@@ -55,6 +55,13 @@ spec:
         retentionPeriod: 30d
         # Safety net against a log flood filling the volume before 30 days.
         retentionDiskSpaceUsage: 15
+        nodeSelector:
+          kubernetes.io/arch: amd64
+    traces:
+      enabled: true
+      server:
+        retentionPeriod: 14d
+        retentionDiskSpaceUsage: 8
         nodeSelector:
           kubernetes.io/arch: amd64
     kubernetes:
