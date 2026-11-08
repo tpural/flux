@@ -23,6 +23,26 @@ spec:
     name: cloudflare-operator
     namespace: flux-system
   timeout: 2m
+  # Upstream's config/crd leaves kustomize placeholders that config/default fills in. Without
+  # these, the two Kustomizations keep overwriting each other's CRDs.
+  patches:
+    - target:
+        kind: CustomResourceDefinition
+        group: apiextensions.k8s.io
+      patch: |
+        - op: add
+          path: /metadata/annotations/cert-manager.io~1inject-ca-from
+          value: cloudflare-operator-system/cloudflare-operator-serving-cert
+    - target:
+        kind: CustomResourceDefinition
+        name: clustertunnels.networking.cfargotunnel.com
+      patch: |
+        - op: replace
+          path: /spec/conversion/webhook/clientConfig/service
+          value:
+            name: cloudflare-operator-webhook-service
+            namespace: cloudflare-operator-system
+            path: /convert
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
