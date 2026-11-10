@@ -37,10 +37,286 @@ spec:
       valuesKey: token
       targetPath: kubernetes.tremolo.token
   values:
+    dashboards:
+      angelorooms.yaml: |
+        id: angelorooms
+        title: angelorooms
+        group: Services
+        description: angelorooms.com as visitors see it (errors, page views, Web Vitals) and as it runs.
+        panels:
+          - title: Page views today
+            type: stat
+            query: 'sum(sum_over_time(browser_events{app="angelorooms", kind="page_view"}[1d])) or vector(0)'
+            width: 3
+          - title: JavaScript errors today
+            type: stat
+            query: 'sum(sum_over_time(browser_events{app="angelorooms", kind="exception"}[1d])) or vector(0)'
+            warn: 1
+            bad: 20
+            width: 3
+          - title: LCP p75, slowest page (good under 2.5s)
+            type: stat
+            query: 'max(quantile_over_time(0.75, browser_web_vitals{app="angelorooms", name="lcp"}[1d])) / 1000'
+            unit: seconds
+            warn: 2.5
+            bad: 4
+            width: 3
+          - title: INP p75, slowest page (good under 200ms)
+            type: stat
+            query: 'max(quantile_over_time(0.75, browser_web_vitals{app="angelorooms", name="inp"}[1d]))'
+            unit: ms
+            warn: 200
+            bad: 500
+            width: 3
+          - title: Page views per hour
+            query: 'sum(sum_over_time(browser_events{app="angelorooms", kind="page_view"}[1h]))'
+            legend: page views
+            width: 6
+          - title: JavaScript errors per hour
+            query: 'sum by (page) (sum_over_time(browser_events{app="angelorooms", kind="exception"}[1h]))'
+            legend: "{{page}}"
+            width: 6
+          - title: Top pages today
+            type: table
+            query: 'topk(10, sum by (page) (sum_over_time(browser_events{app="angelorooms", kind="page_view"}[1d])))'
+            legend: "{{page}}"
+            width: 6
+          - title: Web Vitals p75 by page today (LCP and INP in ms)
+            type: table
+            query: 'quantile_over_time(0.75, browser_web_vitals{app="angelorooms", name=~"lcp|inp"}[1d])'
+            legend: "{{name}} {{page}}"
+            width: 6
+          - title: LCP p75 over time
+            query: 'quantile_over_time(0.75, browser_web_vitals{app="angelorooms", name="lcp"}[1h]) / 1000'
+            legend: "{{page}}"
+            unit: seconds
+            width: 6
+          - title: Layout shift (CLS) p75 (good under 0.1)
+            query: 'quantile_over_time(0.75, browser_web_vitals{app="angelorooms", name="cls"}[1h])'
+            legend: "{{page}}"
+            width: 6
+          - title: Latest JavaScript errors
+            type: logs
+            query: '{stream="browser", app="angelorooms"} kind:=exception'
+            width: 12
+          - title: Server memory
+            query: 'sum by (container) (container_memory_working_set_bytes{namespace="angelorooms", container!=""})'
+            legend: "{{container}}"
+            unit: bytes
+            width: 4
+          - title: Server CPU
+            query: 'sum by (container) (rate(container_cpu_usage_seconds_total{namespace="angelorooms", container!=""}[5m]))'
+            legend: "{{container}}"
+            width: 4
+          - title: Restarts in the last hour
+            query: 'sum by (k8s_pod_name) (increase_prometheus(k8s_container_restarts{k8s_namespace_name="angelorooms"}[1h]))'
+            legend: "{{k8s_pod_name}}"
+            width: 4
+          - title: Server and tunnel errors
+            type: logs
+            query: '{k8s.namespace.name="angelorooms"} k8s.container.name:* _msg:~"(?i)\berror\b|exception|traceback| 5[0-9][0-9] |\bERR\b"'
+            width: 12
+    # Added once to tremolo's runbooks; edited in tremolo after that.
+    runbooks:
+      crash-loop.md: |
+        ---
+        rules: [crash-loop, pod-stuck]
+        ---
+        # Pods restarting or stuck
+
+        ## First look
+
+        - `kubectl -n <ns> describe pod <pod>`: the last state, exit code, and events (OOMKilled, image pull, probes).
+        - `kubectl -n <ns> logs <pod> --previous`: what it printed before it died.
+        - In tremolo: the pod's logs on its host page, and `container_oom_events_total` for memory kills.
+        - Pending pods: `kubectl -n <ns> get events --field-selector involvedObject.name=<pod>`. A pod waiting
+          for a host possum is waking is normal for a few minutes (pod-stuck leaves those alone).
+
+        ## 2026-11-09: false alarms after a collector change
+
+        - 13 crash-loop alerts fired at once for pods that weren't restarting.
+        - Cause: the rule used `increase()`, which counts a series' first value; when collector labels
+          changed, every pod's lifetime restart count looked new.
+        - Fix: the rule uses `increase_prometheus()` (doesn't count the first value). If a burst of
+          crash-loops appears right after a collector or label change, suspect this before the pods.
+      disk-full.md: |
+        ---
+        rules: [disk-full]
+        ---
+        # A host's disk filling up
+
+        ## Find what's big
+
+        ```sh
+        kubectl debug node/<host> -it --image=busybox:1.36 --profile=sysadmin -- chroot /host sh
+        df -h /; du -xsh /var/lib/containerd /var/log /var/lib/kubelet /home /opt 2>/dev/null | sort -h
+        journalctl --disk-usage
+        ```
+
+        ## Safe cleanups
+
+        - Unused images: `crictl rmi --prune` (kubelet pulls them again if ever needed).
+        - Journal: `journalctl --vacuum-size=500M`.
+        - Anything else (old PV data, home directories), look before deleting.
+
+        Delete the `node-debugger-*` pod in `default` afterwards.
+
+        ## 2026-11-10: mm02 at 82%
+
+        - `/var/lib/containerd` held 64 GB: 195 images, 171 of them unused (old releases of our own apps).
+          The journal was 4 GB.
+        - `crictl rmi --prune` and a journal vacuum took / from 82% to 18%.
+        - kubelet's own image GC only starts at 85% by default, so this builds up on busy nodes.
+      flux-failing.md: |
+        ---
+        rules: [flux-failing]
+        ---
+        # Flux failing to reconcile
+
+        - `flux get all -A --status-selector ready=false`, then `flux logs --level=error --since=1h`.
+        - One-off warnings are normal: git fetch timeouts, a chart pulled before CI finished publishing it.
+          flux-failing only fires after 30 minutes of failures with no success since.
+        - A HelmRelease stuck after a failed upgrade: `flux reconcile helmrelease <name> -n flux-system --force`.
+        - A Kustomization failing to build: `kubectl kustomize apps/<app>` locally shows the error (often a
+          file listed in kustomization.yaml that isn't committed).
+      host-down.md: |
+        ---
+        rules: [host-down, wake-stuck, possum-errors]
+        ---
+        # A host down, or not waking
+
+        ## Asleep on purpose or broken?
+
+        - possum puts gpu01 and Pis to sleep or off; tremolo shows those as asleep/off, and host-down
+          leaves them alone. The host page's **Power** strip shows when it slept and woke, and how long
+          wakes usually take.
+        - `host-down` with state `notready`: kubelet stopped reporting. `unreachable`: no metrics at all
+          (powered off, network, or the agent pod died).
+
+        ## Checks
+
+        - `kubectl get node <host> -o wide`, `kubectl describe node <host>` (conditions, taints).
+        - Pis: if it won't come back after a kernel change or with mount/ext4/mmcblk errors, see the
+          Pi SD card runbook (`~/Repos/flux/docs/runbooks/pi-sd-card-replacement.md`, not in git); kernels are
+          custom BTF builds, never apt kernel packages.
+        - gpu01: after kubelet upgrades the NVIDIA toolkit can deadlock containerd; delete the toolkit pod on gpu01.
+        - possum: `kubectl -n possum logs deploy/possum | grep -i error`; `possum_driver_errors_total` by driver.
+
+        ## 2026-11-08: possum's UniFi driver failing
+
+        - 210 UniFi driver errors in 30 minutes (PoE power actions failing), found by replaying
+          possum-errors over the week; it recovered on its own.
+      ingest-tokens.md: |
+        # Senders and ingest tokens
+
+        tremolo's ingest (4318/4317) takes tokens from the `tremolo-ingest` secret (SOPS, in the flux
+        repo); each token's name becomes the `source` label. Senders: `homelab` (the cluster collector,
+        token via the HelmRelease's `valuesFrom` secret `tremolo-collector-token`) and `angelorooms`
+        (browser telemetry, through the site's nginx).
+
+        ## After changing a token
+
+        The collector pods read the token only at start; restart them or every push gets a 401 and data
+        is dropped: `kubectl -n tremolo rollout restart ds/tremolo-agent-agent deploy/tremolo-cluster`.
+
+        ## 2026-11-10: switching tokens on
+
+        About 5 minutes of collector data was dropped between turning tokens on and restarting the
+        collectors. The Storage page's "Received, by sender" chart shows a sender going quiet.
+      restore-database.md: |
+        ---
+        rules: [backup-stale]
+        ---
+        # tremolo's database: backups and restoring
+
+        tremolo keeps users, alert history, rules, runbooks and maintenance in `tremolo.db` on the
+        `tremolo-data` volume (NFS). It copies it daily to `backups/tremolo-YYYYMMDD-HHMMSS.db` (7 kept),
+        and before any schema migration to `tremolo-schema-N.db` beside it.
+
+        ## backup-stale fired
+
+        - `kubectl -n tremolo logs deploy/tremolo | grep backup`: the error (disk full, NFS hung, permissions).
+        - `tremolo_backup_age_seconds` on the Storage page or in Logs/metrics.
+
+        ## Restore
+
+        ```sh
+        kubectl -n tremolo scale deploy/tremolo --replicas=0
+        kubectl -n tremolo run restore --rm -it --restart=Never --image=busybox --overrides='{"spec":{"containers":[{
+          "name":"restore","image":"busybox","stdin":true,"tty":true,"command":["sh"],
+          "volumeMounts":[{"name":"data","mountPath":"/data"}]}],
+          "volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"tremolo-data"}}]}}'
+        # in the pod: ls -l /data/backups; cp /data/backups/tremolo-….db /data/tremolo.db; rm -f /data/tremolo.db-journal
+        kubectl -n tremolo scale deploy/tremolo --replicas=1
+        ```
+
+        An older tremolo refuses a newer schema: to roll back a release that migrated, restore the
+        `tremolo-schema-N.db` copy it made, then pin the older version.
+      tunnel-down.md: |
+        ---
+        rules: [workload-down]
+        ---
+        # A Deployment or StatefulSet missing replicas
+
+        - `kubectl -n <ns> get deploy,sts,pods -o wide` and `kubectl -n <ns> describe pod <pod>`.
+        - Rollouts in progress briefly show fewer ready replicas; workload-down waits 15 minutes.
+
+        ## Cloudflare tunnels (angelorooms-tunnel, home-assistant-tunnel)
+
+        - Both tunnels down together usually means the internet is down, not the cluster: check other
+          outside reachability, and Flux's git/helm fetches failing at the same time.
+        - After any change to a cloudflare-operator Tunnel (e.g. the cloudflared image), its routes are
+          wiped and the site 404s until the binding reconciles:
+          `kubectl -n <ns> annotate tunnelbinding <name> reconcile-at=$(date +%s) --overwrite`,
+          then check the site returns 200.
+
+        ## 2026-11-10 03:20–03:54: both tunnels down
+
+        - angelorooms-tunnel and home-assistant-tunnel lost their ready replica, and Flux couldn't fetch
+          the metallb chart (i/o timeout) at the same time: an internet outage. Found by replaying
+          workload-down and flux-failing; nothing alerted at the time.
     ingest:
       existingSecret: tremolo-ingest
     alerts:
       envFromSecret: tremolo-alerts-env
+      # Rules for this homelab's own services.
+      rules:
+        gridtie-errors.star: |
+          # gridtie answering with errors: at least 3, and over a fifth of requests, in 15 minutes.
+          EVERY = "5m"
+
+          def check(now):
+              errors = metric('sum(increase_prometheus(gridtie_requests_total{code!~"2.."}[15m]))') or 0
+              total = metric("sum(increase_prometheus(gridtie_requests_total[15m]))") or 0
+              if errors >= 3 and errors / total > 0.2:
+                  return alert("gridtie answered %d of %d requests with errors in 15 minutes" % (errors, total))
+              return ok()
+        gridtie-local-failing.star: |
+          # gridtie skipping the local models because they error, so requests go to OpenRouter.
+          EVERY = "5m"
+
+          def check(now):
+              skips = metric('sum(increase_prometheus(gridtie_skips_total{reason="error"}[30m]))') or 0
+              if skips >= 3:
+                  return alert("gridtie skipped the local models %d times in 30 minutes because they failed" % skips)
+              return ok()
+        angelorooms-errors.star: |
+          # angelorooms visitors hitting JavaScript errors: a burst in the last 15 minutes,
+          # or errors from a release that came out in the last hour.
+          EVERY = "5m"
+
+          def check(now):
+              out = []
+              n = metric('sum(sum_over_time(browser_events{app="angelorooms", kind="exception"}[15m]))') or 0
+              if n >= 10:
+                  out.append(alert("angelorooms visitors hit %d JavaScript errors in 15 minutes" % n, key = "burst"))
+              for e in logs('{stream="browser", app="angelorooms"} kind:=exception', since = "1h", limit = 50):
+                  release = e.get("release", "")
+                  first = logs('{stream="browser", app="angelorooms"} release:=%s' % repr(release), since = "7d", limit = 1000)
+                  if release and first and len(first) < 1000 and time.parse_time(first[-1]["_time"]).unix > now.unix - 3600:
+                      out.append(alert("angelorooms %s, released in the last hour, is throwing: %s" % (release, e.get("_msg", "")[:150]), key = "release:" + release))
+                      break
+              return out
       config:
         timezone: America/Chicago
         url: https://tremolo.lan.tapslab.com
