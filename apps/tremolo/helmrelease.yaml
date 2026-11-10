@@ -312,7 +312,7 @@ spec:
                   out.append(alert("angelorooms visitors hit %d JavaScript errors in 15 minutes" % n, key = "burst"))
               for e in logs('{stream="browser", app="angelorooms"} kind:=exception', since = "1h", limit = 50):
                   release = e.get("release", "")
-                  first = logs('{stream="browser", app="angelorooms"} release:=%s' % repr(release), since = "7d", limit = 1000)
+                  first = logs('{stream="browser", app="angelorooms"} release:=%s' % repr(release), since = "168h", limit = 1000)
                   if release and first and len(first) < 1000 and time.parse_time(first[-1]["_time"]).unix > now.unix - 3600:
                       out.append(alert("angelorooms %s, released in the last hour, is throwing: %s" % (release, e.get("_msg", "")[:150]), key = "release:" + release))
                       break
