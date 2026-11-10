@@ -31,8 +31,6 @@ spec:
         name: tremolo
         namespace: flux-system
   values:
-    heartbeat:
-      url: http://tremolo.tremolo.svc/healthz
     alerts:
       envFromSecret: tremolo-alerts-env
       config:
