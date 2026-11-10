@@ -16,7 +16,7 @@ spec:
       serviceAccountName: angelorooms
       containers:
         - name: angelorooms
-          image: ghcr.io/tpural/portfolio-site:1.1.0
+          image: ghcr.io/tpural/portfolio-site:1.2.0
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -47,6 +47,12 @@ spec:
                 secretKeyRef:
                   name: angelorooms-auth-secret
                   key: NEXT_PUBLIC_GOOGLE_CLIENT_ID
+            # nginx forwards browser telemetry (/rum) to tremolo with this ingest token.
+            - name: TREMOLO_RUM_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: angelorooms-rum
+                  key: TREMOLO_RUM_TOKEN
           volumeMounts:
             - name: angelorooms-data
               mountPath: /app/backend/data
