@@ -323,6 +323,10 @@ spec:
         notify:
           page: phone
           warn: phone
+        # Monday mornings: the week in one notification.
+        digest:
+          at: Mon 08:00
+          notify: phone
         channels:
           phone:
             type: homeassistant
