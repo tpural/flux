@@ -25,7 +25,7 @@ spec:
   chart:
     spec:
       chart: tremolo
-      version: "0.23.0-rc.20.22"
+      version: "0.23.0"
       sourceRef:
         kind: HelmRepository
         name: tremolo
