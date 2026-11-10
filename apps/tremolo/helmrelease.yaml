@@ -30,7 +30,15 @@ spec:
         kind: HelmRepository
         name: tremolo
         namespace: flux-system
+  # The collector's ingest token, kept out of this file.
+  valuesFrom:
+    - kind: Secret
+      name: tremolo-collector-token
+      valuesKey: token
+      targetPath: kubernetes.tremolo.token
   values:
+    ingest:
+      existingSecret: tremolo-ingest
     alerts:
       envFromSecret: tremolo-alerts-env
       config:
