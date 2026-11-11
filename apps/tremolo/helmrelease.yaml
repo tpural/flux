@@ -41,6 +41,9 @@ spec:
     agents:
       enabled: true
       first: false
+      # Sent to agents.notify once a Slack channel is added to the alerts config.
+      report:
+        at: "08:00"
       protect:
         - name: control plane
           hosts: [pi-17ef2511, pi-33d717ba, pi-be2bbae5]
