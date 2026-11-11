@@ -37,85 +37,12 @@ spec:
       valuesKey: token
       targetPath: kubernetes.tremolo.token
   values:
-    dashboards:
-      angelorooms.yaml: |
-        id: angelorooms
-        title: angelorooms
-        group: Services
-        description: angelorooms.com as visitors see it (errors, page views, Web Vitals) and as it runs.
-        panels:
-          - title: Page views today
-            type: stat
-            query: 'sum(sum_over_time(browser_events{app="angelorooms", kind="page_view"}[1d])) or vector(0)'
-            width: 3
-          - title: JavaScript errors today
-            type: stat
-            query: 'sum(sum_over_time(browser_events{app="angelorooms", kind="exception"}[1d])) or vector(0)'
-            warn: 1
-            bad: 20
-            width: 3
-          - title: LCP p75, slowest page (good under 2.5s)
-            type: stat
-            query: 'max(quantile_over_time(0.75, browser_web_vitals{app="angelorooms", name="lcp"}[1d])) / 1000'
-            unit: seconds
-            warn: 2.5
-            bad: 4
-            width: 3
-          - title: INP p75, slowest page (good under 200ms)
-            type: stat
-            query: 'max(quantile_over_time(0.75, browser_web_vitals{app="angelorooms", name="inp"}[1d]))'
-            unit: ms
-            warn: 200
-            bad: 500
-            width: 3
-          - title: Page views per hour
-            query: 'sum(sum_over_time(browser_events{app="angelorooms", kind="page_view"}[1h]))'
-            legend: page views
-            width: 6
-          - title: JavaScript errors per hour
-            query: 'sum by (page) (sum_over_time(browser_events{app="angelorooms", kind="exception"}[1h]))'
-            legend: "{{page}}"
-            width: 6
-          - title: Top pages today
-            type: table
-            query: 'topk(10, sum by (page) (sum_over_time(browser_events{app="angelorooms", kind="page_view"}[1d])))'
-            legend: "{{page}}"
-            width: 6
-          - title: Web Vitals p75 by page today (LCP and INP in ms)
-            type: table
-            query: 'quantile_over_time(0.75, browser_web_vitals{app="angelorooms", name=~"lcp|inp"}[1d])'
-            legend: "{{name}} {{page}}"
-            width: 6
-          - title: LCP p75 over time
-            query: 'quantile_over_time(0.75, browser_web_vitals{app="angelorooms", name="lcp"}[1h]) / 1000'
-            legend: "{{page}}"
-            unit: seconds
-            width: 6
-          - title: Layout shift (CLS) p75 (good under 0.1)
-            query: 'quantile_over_time(0.75, browser_web_vitals{app="angelorooms", name="cls"}[1h])'
-            legend: "{{page}}"
-            width: 6
-          - title: Latest JavaScript errors
-            type: logs
-            query: '{stream="browser", app="angelorooms"} kind:=exception'
-            width: 12
-          - title: Server memory
-            query: 'sum by (container) (container_memory_working_set_bytes{namespace="angelorooms", container!=""})'
-            legend: "{{container}}"
-            unit: bytes
-            width: 4
-          - title: Server CPU
-            query: 'sum by (container) (rate(container_cpu_usage_seconds_total{namespace="angelorooms", container!=""}[5m]))'
-            legend: "{{container}}"
-            width: 4
-          - title: Restarts in the last hour
-            query: 'sum by (k8s_pod_name) (increase_prometheus(k8s_container_restarts{k8s_namespace_name="angelorooms"}[1h]))'
-            legend: "{{k8s_pod_name}}"
-            width: 4
-          - title: Server and tunnel errors
-            type: logs
-            query: '{k8s.namespace.name="angelorooms"} k8s.container.name:* _msg:~"(?i)\berror\b|exception|traceback| 5[0-9][0-9] |\bERR\b"'
-            width: 12
+    # Browser apps under Frontend: their server namespace, and pages left out of visitor numbers.
+    frontend:
+      apps:
+        angelorooms:
+          namespace: angelorooms
+          ignorePages: [/admin, /login]
     # Added once to tremolo's runbooks; edited in tremolo after that.
     runbooks:
       crash-loop.md: |
