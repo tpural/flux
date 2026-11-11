@@ -37,6 +37,14 @@ spec:
       valuesKey: token
       targetPath: kubernetes.tremolo.token
   values:
+    # AI agents work alerts through investigations; people still hear of every alert until first is on.
+    agents:
+      enabled: true
+      first: false
+      protect:
+        - name: control plane
+          hosts: [pi-17ef2511, pi-33d717ba, pi-be2bbae5]
+          maxAtOnce: 1
     # Browser apps under Frontend: their server namespace, and pages left out of visitor numbers.
     frontend:
       apps:
