@@ -41,7 +41,8 @@ spec:
     agents:
       enabled: true
       first: false
-      # Sent to agents.notify once a Slack channel is added to the alerts config.
+      # Pause notices and the daily report go to #lab-ops.
+      notify: [discord]
       report:
         at: "08:00"
       protect:
@@ -271,6 +272,10 @@ spec:
             url: http://home-assistant-lb.home-assistant.svc
             service: mobile_app_tims_iphone
             token: ${HA_TOKEN}
+          # #lab-ops, through Discord's Slack-compatible webhook (the URL ends in /slack).
+          discord:
+            type: slack
+            url: ${DISCORD_WEBHOOK}
     providers:
       kubernetes:
         asleepTaints: [possum.dev/asleep]
