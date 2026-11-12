@@ -44,6 +44,8 @@ spec:
       first: true
       grace: 20m
       always: [page, upkeeper-health]
+      # Restarts, pod deletions and scales an agent may make in an hour.
+      maxDisruptivePerHour: 6
       # Pause notices and the daily report go to #lab-ops.
       notify: [discord]
       report:
