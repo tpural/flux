@@ -231,8 +231,6 @@ spec:
           - title: GPU wakes today
             type: stat
             query: 'sum(increase(upkeeper_gpu_wakes_total[24h]))'
-            warn: 4
-            bad: 6
             width: 2
           - title: Investigations today
             type: stat
@@ -292,9 +290,6 @@ spec:
               stuck = metric('sum(increase(upkeeper_investigations_total{outcome=~"stopped|error"}[24h]))') or 0
               if total >= 4 and stuck / total > 0.5:
                   out.append(alert("upkeeper gave up on %d of its %d investigations today; see Agents for where the model gets stuck" % (stuck, total), key = "stuck"))
-              wakes = metric("sum(increase(upkeeper_gpu_wakes_total[24h]))") or 0
-              if wakes >= 6:
-                  out.append(alert("upkeeper woke the GPU %d times today, its limit: more alerts will go to people untouched" % wakes, key = "wakes", severity = "info"))
               return out
         gridtie-errors.star: |
           # gridtie answering with errors: at least 3, and over a fifth of requests, in 15 minutes.

@@ -10,7 +10,6 @@ model:
 gpu:
   deployment: llama-swap/llama-swap
   wakeDelay: 3m
-  maxWakesPerDay: 6
 patrol:
   every: 1h
   at: "07:30"
