@@ -1,0 +1,17 @@
+name: upkeeper
+tremolo:
+  url: http://tremolo.tremolo.svc
+model:
+  # The gate in front of llama-swap: it wakes gpu01 and holds the request until the model is up.
+  url: http://llama-swap.llama-swap.svc:8080/v1
+  name: qwen3-coder-next
+  maxSteps: 30
+  timeout: 15m
+gpu:
+  deployment: llama-swap/llama-swap
+  wakeDelay: 3m
+  maxWakesPerDay: 6
+patrol:
+  every: 1h
+  at: "07:30"
+  timezone: America/Chicago

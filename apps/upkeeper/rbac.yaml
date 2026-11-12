@@ -1,0 +1,40 @@
+# What upkeeper may do in the cluster: look at workloads, restart and scale them, replace pods, cordon nodes.
+# Nothing on secrets or configmaps, and no RBAC rights. tremolo's rails decide when; this decides what.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: upkeeper
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: upkeeper
+rules:
+  - apiGroups: [""]
+    resources: [pods, pods/log, events, nodes, namespaces, persistentvolumeclaims]
+    verbs: [get, list, watch]
+  - apiGroups: [""]
+    resources: [pods]
+    verbs: [delete]
+  - apiGroups: [""]
+    resources: [nodes]
+    verbs: [patch]
+  - apiGroups: [apps]
+    resources: [deployments, statefulsets, daemonsets, replicasets]
+    verbs: [get, list, watch]
+  - apiGroups: [apps]
+    resources: [deployments, statefulsets, daemonsets]
+    verbs: [patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: upkeeper
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: upkeeper
+subjects:
+  - kind: ServiceAccount
+    name: upkeeper
+    namespace: upkeeper

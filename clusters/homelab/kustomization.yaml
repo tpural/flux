@@ -23,6 +23,7 @@ resources:
 - ../../apps/possum/flux.yaml
 - ../../apps/gridtie/flux.yaml
 - ../../apps/tremolo/flux.yaml
+- ../../apps/upkeeper/flux.yaml
 
 components:
 - config/metallb
