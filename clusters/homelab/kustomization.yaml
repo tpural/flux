@@ -24,6 +24,7 @@ resources:
 - ../../apps/gridtie/flux.yaml
 - ../../apps/tremolo/flux.yaml
 - ../../apps/upkeeper/flux.yaml
+- ../../apps/searxng/flux.yaml
 
 components:
 - config/metallb

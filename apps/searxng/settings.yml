@@ -1,0 +1,14 @@
+# Web search for the lab's agents (upkeeper), inside the cluster only.
+use_default_settings:
+  engines:
+    keep_only: [google, duckduckgo, brave, startpage, bing, github, stackoverflow, wikipedia]
+server:
+  # The secret comes from $SEARXNG_SECRET.
+  limiter: false
+  image_proxy: false
+  public_instance: false
+search:
+  safe_search: 0
+  formats: [html, json]
+ui:
+  query_in_title: false
