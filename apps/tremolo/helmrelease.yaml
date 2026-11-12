@@ -25,7 +25,7 @@ spec:
   chart:
     spec:
       chart: tremolo
-      version: "0.35.0"
+      version: "0.35.1"
       sourceRef:
         kind: HelmRepository
         name: tremolo
@@ -37,10 +37,13 @@ spec:
       valuesKey: token
       targetPath: kubernetes.tremolo.token
   values:
-    # AI agents work alerts through investigations; people still hear of every alert until first is on.
+    # AI agents (upkeeper) work alerts first: warnings reach people only if no agent claims them in
+    # 5 minutes, an agent escalates, or they're still firing after 20. Pages go out at once.
     agents:
       enabled: true
-      first: false
+      first: true
+      grace: 20m
+      always: [page]
       # Pause notices and the daily report go to #lab-ops.
       notify: [discord]
       report:
