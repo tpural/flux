@@ -43,7 +43,7 @@ spec:
       enabled: true
       first: true
       grace: 20m
-      always: [page]
+      always: [page, upkeeper-health]
       # Pause notices and the daily report go to #lab-ops.
       notify: [discord]
       report:
@@ -217,12 +217,85 @@ spec:
         - angelorooms-tunnel and home-assistant-tunnel lost their ready replica, and Flux couldn't fetch
           the metallb chart (i/o timeout) at the same time: an internet outage. Found by replaying
           workload-down and flux-failing; nothing alerted at the time.
+    dashboards:
+      upkeeper.yaml: |
+        id: upkeeper
+        title: upkeeper
+        group: Agents
+        description: The agent that works alerts first, over time. Each run, step by step, is under Agents.
+        panels:
+          - title: Running
+            type: stat
+            query: 'max(up{namespace="upkeeper"})'
+            width: 2
+          - title: GPU wakes today
+            type: stat
+            query: 'sum(increase(upkeeper_gpu_wakes_total[24h]))'
+            warn: 4
+            bad: 6
+            width: 2
+          - title: Investigations today
+            type: stat
+            query: 'sum(increase(upkeeper_investigations_total[24h]))'
+            width: 2
+          - title: Gave up today
+            type: stat
+            query: 'sum(increase(upkeeper_investigations_total{outcome=~"stopped|error"}[24h])) or vector(0)'
+            warn: 1
+            bad: 3
+            width: 2
+          - title: Tokens today
+            type: stat
+            query: 'sum(increase(upkeeper_tokens_total[24h]))'
+            unit: short
+            width: 2
+          - title: Patrols today
+            type: stat
+            query: 'sum(increase(upkeeper_patrols_total[24h]))'
+            width: 2
+          - title: Investigations by outcome
+            query: 'sum by (outcome) (increase(upkeeper_investigations_total[1h]))'
+            legend: "{{outcome}}"
+            stack: true
+            width: 6
+          - title: Tokens per hour
+            query: 'sum(increase(upkeeper_tokens_total[1h]))'
+            legend: tokens
+            unit: short
+            width: 6
+          - title: Steps per investigation
+            query: 'label_set(histogram_quantile(0.5, sum by (le) (increase(upkeeper_steps_bucket[6h]))), "q", "median") or label_set(histogram_quantile(0.9, sum by (le) (increase(upkeeper_steps_bucket[6h]))), "q", "p90")'
+            legend: "{{q}}"
+            width: 6
+          - title: GPU wakes per hour
+            query: 'sum(increase(upkeeper_gpu_wakes_total[1h]))'
+            legend: wakes
+            width: 6
     ingest:
       existingSecret: tremolo-ingest
     alerts:
       envFromSecret: tremolo-alerts-env
       # Rules for this homelab's own services.
       rules:
+        upkeeper-health.star: |
+          # upkeeper, the agent that works alerts first, down or struggling. In agents.always, so it
+          # reaches people at once rather than waiting for the agent it's about.
+          EVERY = "5m"
+          FOR = "10m"
+
+          def check(now):
+              out = []
+              if not metric('max(up{namespace="upkeeper"})'):
+                  out.append(alert("upkeeper isn't running: no metrics from it in the last 10 minutes", key = "down"))
+              # increase, not increase_prometheus: the counters start fresh with each pod.
+              total = metric("sum(increase(upkeeper_investigations_total[24h]))") or 0
+              stuck = metric('sum(increase(upkeeper_investigations_total{outcome=~"stopped|error"}[24h]))') or 0
+              if total >= 4 and stuck / total > 0.5:
+                  out.append(alert("upkeeper gave up on %d of its %d investigations today; see Agents for where the model gets stuck" % (stuck, total), key = "stuck"))
+              wakes = metric("sum(increase(upkeeper_gpu_wakes_total[24h]))") or 0
+              if wakes >= 6:
+                  out.append(alert("upkeeper woke the GPU %d times today, its limit: more alerts will go to people untouched" % wakes, key = "wakes", severity = "info"))
+              return out
         gridtie-errors.star: |
           # gridtie answering with errors: at least 3, and over a fifth of requests, in 15 minutes.
           EVERY = "5m"
