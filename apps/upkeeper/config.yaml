@@ -17,3 +17,11 @@ patrol:
 # A trace of every run (each model call, tool call and decision) to tremolo's ingest.
 traces:
   url: http://tremolo.tremolo.svc:4318
+# When the model steps back stuck on an error it doesn't understand, it may search the web once.
+# Queries lose these words (and node names, addresses, pod names) before they leave the lab.
+web:
+  searxng: http://searxng.searxng.svc:8080
+  allow: [kubernetes.io, fluxcd.io, docs.victoriametrics.com, github.com, opentelemetry.io, helm.sh,
+          docs.cilium.io, istio.io, cert-manager.io, metallb.io, prometheus.io, stackoverflow.com,
+          serverfault.com, raspberrypi.com, docs.nvidia.com, etcd.io, docs.docker.com, containerd.io]
+  private: [tapslab, gridtie, angelorooms, possum, tremolo, upkeeper, portfolio-site]
