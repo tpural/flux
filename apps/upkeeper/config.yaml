@@ -15,3 +15,6 @@ patrol:
   every: 1h
   at: "07:30"
   timezone: America/Chicago
+# A trace of every run (each model call, tool call and decision) to tremolo's ingest.
+traces:
+  url: http://tremolo.tremolo.svc:4318
