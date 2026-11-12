@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: upkeeper
-          image: ghcr.io/tpural/upkeeper:0.7.4
+          image: ghcr.io/tpural/upkeeper:0.8.0
           envFrom:
             - secretRef:
                 name: upkeeper-tremolo
