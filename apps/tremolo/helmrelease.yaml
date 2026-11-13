@@ -44,10 +44,10 @@ spec:
       first: true
       grace: 20m
       always: [page, upkeeper-health]
-      # Effectively unlimited: the agents run on a local model, so there's no
-      # bill to protect; protect groups and the audit log still apply.
-      maxActionsPerHour: 1000
-      maxDisruptivePerHour: 1000
+      # Actions an agent may take in an hour, and how many of them may be
+      # restarts, pod deletions or scales.
+      maxActionsPerHour: 50
+      maxDisruptivePerHour: 50
       # Pause notices and the daily report go to #lab-ops.
       notify: [discord]
       report:
