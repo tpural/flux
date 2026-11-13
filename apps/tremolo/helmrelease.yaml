@@ -25,7 +25,7 @@ spec:
   chart:
     spec:
       chart: tremolo
-      version: "0.40.0"
+      version: "0.41.0"
       sourceRef:
         kind: HelmRepository
         name: tremolo
@@ -332,6 +332,8 @@ spec:
       config:
         timezone: America/Chicago
         url: https://tremolo.lan.tapslab.com
+        # upkeeper's evals break these on purpose; they're worked as rehearsals instead.
+        ignoreNamespaces: ["eval-*"]
         notify:
           page: phone
           warn: phone
