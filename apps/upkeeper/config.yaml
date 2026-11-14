@@ -4,7 +4,7 @@ tremolo:
 model:
   # The gate in front of llama-swap: it wakes gpu01 and holds the request until the model is up.
   url: http://llama-swap.llama-swap.svc:8080/v1
-  name: qwen3-coder-next
+  name: qwen3-next-80b
   maxSteps: 30
   timeout: 15m
 gpu:
