@@ -93,7 +93,7 @@ spec:
       expression: request.userInfo.username == "system:serviceaccount:kheck:kheck"
     # A namespace selector never skips cluster-scoped objects, like nodes.
     - name: namespaced
-      expression: request.namespace != ""
+      expression: has(request.namespace) && request.namespace != ""
   validations:
     - expression: "false"
       messageExpression: '"namespace " + request.namespace + " is protected from kheck"'
