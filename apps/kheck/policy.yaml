@@ -1,0 +1,143 @@
+# The API server's own limits on kheck's ServiceAccount, whatever kheck's code
+# does: it may only restart and scale workloads, delete pods that have a
+# controller, and cordon nodes other than control planes. Nothing in a
+# protected namespace, and nothing labelled kheck/protected=true.
+#
+# Keep the namespace list in kheck-protected-names in step with
+# protect.namespaces in config.yaml.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: kheck-limits
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [apps]
+        apiVersions: ["*"]
+        resources: [deployments, statefulsets, daemonsets]
+        operations: [UPDATE]
+      - apiGroups: [""]
+        apiVersions: ["*"]
+        resources: [nodes]
+        operations: [UPDATE]
+      - apiGroups: [""]
+        apiVersions: ["*"]
+        resources: [pods]
+        operations: [DELETE]
+  matchConditions:
+    - name: kheck
+      expression: request.userInfo.username == "system:serviceaccount:kheck:kheck"
+  variables:
+    - name: workload
+      expression: request.kind.group == "apps"
+    - name: restartedAt
+      expression: '"kubectl.kubernetes.io/restartedAt"'
+    - name: newAnn
+      expression: 'variables.workload ? object.spec.template.metadata.?annotations.orValue({}) : {}'
+    - name: oldAnn
+      expression: 'variables.workload ? oldObject.spec.template.metadata.?annotations.orValue({}) : {}'
+  validations:
+    - expression: 'oldObject.metadata.?labels.orValue({})[?"kheck/protected"].orValue("") != "true"'
+      message: it's labelled kheck/protected=true
+    - expression: >-
+        !variables.workload || (
+          object.spec.template.spec == oldObject.spec.template.spec &&
+          object.spec.template.metadata.?labels.orValue({}) == oldObject.spec.template.metadata.?labels.orValue({}) &&
+          object.spec.selector == oldObject.spec.selector &&
+          object.spec.?strategy == oldObject.spec.?strategy &&
+          object.spec.?updateStrategy == oldObject.spec.?updateStrategy &&
+          object.metadata.?labels.orValue({}) == oldObject.metadata.?labels.orValue({}))
+      message: kheck may only restart or scale a workload, not change what it runs
+    - expression: >-
+        variables.newAnn.all(k, k == variables.restartedAt || (k in variables.oldAnn && variables.oldAnn[k] == variables.newAnn[k])) &&
+        variables.oldAnn.all(k, k == variables.restartedAt || k in variables.newAnn)
+      message: of the pod template's annotations, kheck may only set restartedAt
+    - expression: >-
+        !variables.workload ||
+        object.spec.?replicas.orValue(1) == oldObject.spec.?replicas.orValue(1) ||
+        (object.spec.replicas >= 1 && object.spec.replicas <= 10)
+      message: kheck may only scale to 1-10 replicas
+    - expression: >-
+        request.kind.kind != "Node" || (
+          object.metadata.?labels.orValue({}) == oldObject.metadata.?labels.orValue({}) &&
+          object.spec.?taints.orValue([]) == oldObject.spec.?taints.orValue([]) &&
+          (!("node-role.kubernetes.io/control-plane" in object.metadata.?labels.orValue({})) || !object.spec.?unschedulable.orValue(false)))
+      message: kheck may only cordon or uncordon a node, and never cordon a control plane
+    - expression: 'request.kind.kind != "Pod" || size(oldObject.metadata.?ownerReferences.orValue([])) > 0'
+      message: kheck may only delete a pod its controller will replace
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: kheck-limits
+spec:
+  policyName: kheck-limits
+  validationActions: [Deny]
+---
+# Nothing at all in a protected namespace.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: kheck-protected
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["", apps]
+        apiVersions: ["*"]
+        resources: ["*"]
+        operations: [CREATE, UPDATE, DELETE]
+  matchConditions:
+    - name: kheck
+      expression: request.userInfo.username == "system:serviceaccount:kheck:kheck"
+    # A namespace selector never skips cluster-scoped objects, like nodes.
+    - name: namespaced
+      expression: request.namespace != ""
+  validations:
+    - expression: "false"
+      messageExpression: '"namespace " + request.namespace + " is protected from kheck"'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: kheck-protected-names
+spec:
+  policyName: kheck-protected
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - kube-system
+            - kube-public
+            - kube-node-lease
+            - flux-system
+            - cert-manager
+            - cilium-secrets
+            - metallb-system
+            - istio-system
+            - gpu-operator
+            - nfs-provisioner
+            - postgres
+            - cloudflare-operator
+            - cloudflare-operator-system
+            - external-dns
+            - possum
+            - tremolo
+            - upkeeper
+            - kheck
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: kheck-protected-label
+spec:
+  policyName: kheck-protected
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        kheck/protected: "true"

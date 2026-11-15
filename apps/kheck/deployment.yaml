@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kheck
+  namespace: kheck
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: kheck}
+  template:
+    metadata:
+      labels: {app: kheck}
+    spec:
+      serviceAccountName: kheck
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: kheck
+          image: ghcr.io/tpural/kheck:0.1.0
+          ports: [{name: http, containerPort: 8080}]
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 10m, memory: 32Mi}
+            limits: {memory: 128Mi}
+          volumeMounts: [{name: config, mountPath: /etc/kheck}]
+      volumes:
+        - name: config
+          configMap: {name: kheck-config}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kheck
+  namespace: kheck
+spec:
+  selector: {app: kheck}
+  ports: [{name: http, port: 8080, targetPort: http}]
+
