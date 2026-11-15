@@ -14,6 +14,9 @@ patrol:
   every: 1h
   at: "07:30"
   timezone: America/Chicago
+# Changes go through kheck, which gates them; upkeeper has no write access of its own.
+kheck:
+  url: http://kheck.kheck.svc:8080/mcp
 # A trace of every run (each model call, tool call and decision) to tremolo's ingest.
 traces:
   url: http://tremolo.tremolo.svc:4318
