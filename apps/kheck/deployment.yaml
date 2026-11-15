@@ -18,7 +18,7 @@ spec:
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: kheck
-          image: ghcr.io/tpural/kheck:0.1.0
+          image: ghcr.io/tpural/kheck:0.1.1
           ports: [{name: http, containerPort: 8080}]
           readinessProbe:
             httpGet: {path: /healthz, port: http}
