@@ -20,9 +20,9 @@ spec:
         - name: kheck
           image: ghcr.io/tpural/kheck:0.2.0
           ports: [{name: http, containerPort: 8080}]
-          # Each change's log record goes to tremolo's ingest too.
+          # Each change's log record goes to tremolo too, through the cluster collector (it holds the ingest token).
           env:
-            - {name: OTEL_EXPORTER_OTLP_ENDPOINT, value: http://tremolo.tremolo.svc:4318}
+            - {name: OTEL_EXPORTER_OTLP_ENDPOINT, value: http://tremolo-cluster.tremolo.svc:4318}
           readinessProbe:
             httpGet: {path: /healthz, port: http}
           securityContext:
