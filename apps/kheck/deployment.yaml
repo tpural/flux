@@ -18,8 +18,11 @@ spec:
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: kheck
-          image: ghcr.io/tpural/kheck:0.1.1
+          image: ghcr.io/tpural/kheck:0.2.0
           ports: [{name: http, containerPort: 8080}]
+          # Each change's log record goes to tremolo's ingest too.
+          env:
+            - {name: OTEL_EXPORTER_OTLP_ENDPOINT, value: http://tremolo.tremolo.svc:4318}
           readinessProbe:
             httpGet: {path: /healthz, port: http}
           securityContext:

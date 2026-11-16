@@ -1,7 +1,10 @@
 # kheck makes every change agents ask for. Keep protect.namespaces in step with
 # kheck-protected-names in policy.yaml: the API server enforces it again.
-tremolo:
-  url: http://tremolo.tremolo.svc
+# upkeeper connects with a projected ServiceAccount token for kheck.
+callers: [system:serviceaccount:upkeeper:upkeeper]
+# For query gates; none yet.
+metrics:
+  url: http://tremolo-metrics-server.tremolo.svc:8428
 settle: 90s
 protect:
   namespaces:

@@ -9,6 +9,10 @@ kind: ClusterRole
 metadata:
   name: kheck
 rules:
+  # Checking callers' tokens.
+  - apiGroups: [authentication.k8s.io]
+    resources: [tokenreviews]
+    verbs: [create]
   # What the checks read.
   - apiGroups: [""]
     resources: [nodes, namespaces, pods, events]
