@@ -26,6 +26,7 @@ protect:
     - tremolo
     - upkeeper
     - kheck
+    - llama-swap
 # POSSUM powers gpu01 down: that's not a node down or cordoned.
 asleepTaints: [possum.dev/asleep]
 gates:

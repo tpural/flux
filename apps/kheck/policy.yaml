@@ -129,6 +129,7 @@ spec:
             - tremolo
             - upkeeper
             - kheck
+            - llama-swap
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicyBinding
