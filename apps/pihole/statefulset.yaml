@@ -42,6 +42,9 @@ spec:
             secretKeyRef:
               name: pihole-secret
               key: API_TOKEN
+        # The query log is SQLite with a WAL; over NFS a NAS stall crashes FTL (SIGBUS).
+        - name: FTLCONF_files_database
+          value: /var/lib/pihole-db/pihole-FTL.db
         envFrom:
         - configMapRef:
             name: pihole-config
@@ -54,6 +57,8 @@ spec:
           mountPath: /var/log
         - name: run-log
           mountPath: /run/log
+        - name: query-db
+          mountPath: /var/lib/pihole-db
         resources:
           requests:
             memory: "512Mi"
@@ -62,11 +67,11 @@ spec:
             memory: "1Gi"
             cpu: "500m"
         livenessProbe:
-          httpGet:
-            path: /admin/
-            port: 80
+          exec:
+            command: [dig, +short, +time=2, +tries=1, "@127.0.0.1", pi.hole]
           initialDelaySeconds: 60
           periodSeconds: 30
+          timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /admin/
@@ -82,6 +87,8 @@ spec:
       - name: var-log
         emptyDir: {}
       - name: run-log
+        emptyDir: {}
+      - name: query-db
         emptyDir: {}
   volumeClaimTemplates:
   - metadata:
