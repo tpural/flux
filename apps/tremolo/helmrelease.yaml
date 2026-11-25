@@ -52,6 +52,12 @@ spec:
       notify: [discord]
       report:
         at: "08:00"
+      # Restarts, pod deletions and scales wait for a person to approve them (in Discord or on
+      # the investigation's page), and are dropped after approveWithin.
+      approve:
+        - name: disruptive changes
+          disruptive: true
+      approveWithin: 30m
       protect:
         - name: control plane
           hosts: [pi-17ef2511, pi-33d717ba, pi-be2bbae5]
@@ -337,8 +343,8 @@ spec:
         # upkeeper's evals break these on purpose; they're worked as rehearsals instead.
         ignoreNamespaces: ["eval-*"]
         notify:
-          page: phone
-          warn: phone
+          page: [phone, discord]
+          warn: [phone, discord]
         # Monday mornings: the week in one notification.
         digest:
           at: Mon 08:00
@@ -349,10 +355,11 @@ spec:
             url: http://home-assistant-lb.home-assistant.svc
             service: mobile_app_tims_iphone
             token: ${HA_TOKEN}
-          # #lab-ops, through Discord's Slack-compatible webhook (the URL ends in /slack).
+          # #lab-ops, through the tremolo-discord bot: buttons to acknowledge, silence and approve.
           discord:
-            type: slack
-            url: ${DISCORD_WEBHOOK}
+            type: webhook
+            url: http://tremolo-discord.tremolo-discord.svc:8080/notify
+            token: ${BOT_WEBHOOK_TOKEN}
     providers:
       kubernetes:
         asleepTaints: [possum.dev/asleep]
