@@ -1,0 +1,12 @@
+# molt: Minecraft that updates without restarting (github.com/tpural/molt).
+motd: tapslab
+root: /var/lib/molt
+runner: kubernetes
+kubernetes:
+  memory: 4Gi
+spec:
+  image: ghcr.io/tpural/molt-paper:0.1.0
+  env:
+    VERSION: "26.3"
+    MEMORY: 3G
+    DIFFICULTY: normal

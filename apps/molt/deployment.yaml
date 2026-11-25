@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: molt
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: molt
+  template:
+    metadata:
+      labels:
+        app: molt
+    spec:
+      serviceAccountName: molt
+      # The worlds are on this node's disk, and backends run beside molt.
+      nodeSelector:
+        kubernetes.io/hostname: mm02
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        # The node's directory is made by Kubernetes, as root: hand it to molt.
+        - name: own
+          image: busybox:1.37
+          command: [chown, "1000:1000", /var/lib/molt]
+          securityContext:
+            runAsUser: 0
+            runAsNonRoot: false
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL], add: [CHOWN]}
+          volumeMounts:
+            - {name: worlds, mountPath: /var/lib/molt}
+      containers:
+        - name: molt
+          image: ghcr.io/tpural/molt:0.1.0
+          args: [serve]
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef: {fieldPath: spec.nodeName}
+          envFrom:
+            - secretRef: {name: molt}
+          ports:
+            - {name: game, containerPort: 25565}
+            - {name: api, containerPort: 8080}
+          readinessProbe:
+            httpGet: {path: /healthz, port: api}
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {memory: 256Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: config, mountPath: /etc/molt}
+            # The same path as on the node: backends mount their generation from it.
+            - {name: worlds, mountPath: /var/lib/molt}
+      volumes:
+        - name: config
+          configMap: {name: molt}
+        - name: worlds
+          hostPath: {path: /var/lib/molt, type: DirectoryOrCreate}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: molt
+  annotations:
+    metallb.universe.tf/address-pool: homelab-pool
+    external-dns.alpha.kubernetes.io/hostname: minecraft.lan.tapslab.com
+spec:
+  type: LoadBalancer
+  selector:
+    app: molt
+  ports:
+    - {name: game, port: 25565, targetPort: game}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: molt-api
+spec:
+  selector:
+    app: molt
+  ports:
+    - {name: api, port: 8080, targetPort: api}

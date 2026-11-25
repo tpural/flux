@@ -26,6 +26,7 @@ resources:
 - ../../apps/tremolo-discord/flux.yaml
 - ../../apps/kheck/flux.yaml
 - ../../apps/upkeeper/flux.yaml
+- ../../apps/molt/flux.yaml
 - ../../apps/searxng/flux.yaml
 
 components:
