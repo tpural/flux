@@ -5,7 +5,7 @@ runner: kubernetes
 kubernetes:
   memory: 4Gi
 spec:
-  image: ghcr.io/tpural/molt-paper:0.3.0
+  image: ghcr.io/tpural/molt-paper:0.3.1
   env:
     VERSION: "26.3"
     MEMORY: 3G
