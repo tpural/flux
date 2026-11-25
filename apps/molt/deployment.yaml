@@ -38,7 +38,7 @@ spec:
             - {name: worlds, mountPath: /var/lib/molt}
       containers:
         - name: molt
-          image: ghcr.io/tpural/molt:0.1.0
+          image: ghcr.io/tpural/molt:0.1.1
           args: [serve]
           env:
             - name: NODE_NAME
