@@ -1,6 +1,8 @@
-# tremolo in #lab-ops: alerts, approvals and escalated investigations, with buttons and threads.
+# tremolo in #tapslab-ops: alerts, approvals and escalated investigations, with buttons and threads.
 tremolo:
   url: http://tremolo.tremolo.svc
   ui: https://tremolo.lan.tapslab.com
 discord:
   channel: tapslab-ops
+upkeeper:
+  url: http://upkeeper.upkeeper.svc:9090

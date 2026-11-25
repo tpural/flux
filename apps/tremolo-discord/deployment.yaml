@@ -19,7 +19,7 @@ spec:
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: tremolo-discord
-          image: ghcr.io/tpural/tremolo-discord:0.1.0
+          image: ghcr.io/tpural/tremolo-discord:0.2.0
           envFrom:
             - secretRef: {name: tremolo-discord}
           ports: [{name: http, containerPort: 8080}]
