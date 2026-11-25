@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tremolo-discord
+  namespace: tremolo-discord
+spec:
+  replicas: 1
+  # One Gateway connection at a time, or both bots answer each button.
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: tremolo-discord}
+  template:
+    metadata:
+      labels: {app: tremolo-discord}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: tremolo-discord
+          image: ghcr.io/tpural/tremolo-discord:0.1.0
+          envFrom:
+            - secretRef: {name: tremolo-discord}
+          ports: [{name: http, containerPort: 8080}]
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 10m, memory: 32Mi}
+            limits: {memory: 128Mi}
+          volumeMounts: [{name: config, mountPath: /etc/tremolo-discord}]
+      volumes:
+        - name: config
+          configMap: {name: tremolo-discord-config}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tremolo-discord
+  namespace: tremolo-discord
+spec:
+  selector: {app: tremolo-discord}
+  ports: [{name: http, port: 8080, targetPort: http}]

@@ -1,0 +1,6 @@
+# tremolo in #lab-ops: alerts, approvals and escalated investigations, with buttons and threads.
+tremolo:
+  url: http://tremolo.tremolo.svc
+  ui: https://tremolo.lan.tapslab.com
+discord:
+  channel: lab-ops
