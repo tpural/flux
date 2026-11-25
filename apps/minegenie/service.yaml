@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minegenie
+spec:
+  selector:
+    app: minegenie
+  ports:
+    - port: 8080
+      targetPort: http
+      name: http

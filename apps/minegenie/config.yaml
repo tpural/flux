@@ -1,0 +1,8 @@
+llm:
+  url: http://gridtie.gridtie.svc:8080/v1
+  planner: qwen3-next-80b
+game:
+  molt:
+    url: http://molt-api.molt.svc:8080
+    toolsPort: 25581
+data: /data
