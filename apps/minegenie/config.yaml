@@ -6,3 +6,5 @@ game:
     url: http://molt-api.molt.svc:8080
     toolsPort: 25581
 data: /data
+pack:
+  url: http://minegenie.lan.tapslab.com/pack
