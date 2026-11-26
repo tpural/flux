@@ -5,6 +5,7 @@ resources:
   - namespace.yaml
   - pvc.yaml
   - secret.yaml
+  - rbac.yaml
   - deployment.yaml
   - service.yaml
 configMapGenerator:

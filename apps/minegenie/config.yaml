@@ -1,6 +1,7 @@
 llm:
   url: http://gridtie.gridtie.svc:8080/v1
   planner: qwen3-next-80b
+  coder: deepseek-pro
 game:
   molt:
     url: http://molt-api.molt.svc:8080
@@ -8,3 +9,10 @@ game:
 data: /data
 pack:
   url: http://minegenie.lan.tapslab.com/pack
+plugins:
+  sdk: /opt/minegenie/sdk
+  url: http://minegenie.minegenie.svc:8080/plugins
+  smoke:
+    namespace: minegenie
+    image: itzg/minecraft-server:2026.11.1-java25
+    memory: 2Gi
