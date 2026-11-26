@@ -23,7 +23,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: minegenie
-          image: ghcr.io/tpural/minegenie:0.7.0
+          image: ghcr.io/tpural/minegenie:0.7.1
           envFrom:
             - secretRef:
                 name: minegenie
