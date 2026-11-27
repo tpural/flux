@@ -25,12 +25,3 @@ models:
     routes:
       - {provider: local, model: qwen3-next-80b, maxContext: 65536}
       - {provider: openrouter, model: qwen/qwen3-next-80b-a3b-instruct}
-  # Cloud only: there's no local route, so these always go to OpenRouter.
-  deepseek-pro:
-    name: DeepSeek V4 Pro (cloud)
-    routes:
-      - {provider: openrouter, model: deepseek/deepseek-v4-pro}
-  deepseek-flash:
-    name: DeepSeek V4 Flash (cloud)
-    routes:
-      - {provider: openrouter, model: deepseek/deepseek-v4-flash}
