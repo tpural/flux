@@ -27,7 +27,6 @@ resources:
 - ../../apps/kheck/flux.yaml
 - ../../apps/upkeeper/flux.yaml
 - ../../apps/molt/flux.yaml
-- ../../apps/minegenie/flux.yaml
 - ../../apps/searxng/flux.yaml
 
 components:
